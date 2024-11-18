@@ -1,0 +1,55 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SharedLib", "SharedLib", "{CF0699EB-8EA6-409F-9C73-842C04A3F926}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedLib", "SharedLib\SharedLib\SharedLib.csproj", "{B63B6CFF-B655-41AE-B303-DB050858904C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedLibTests", "SharedLib\SharedLibTests\SharedLibTests.csproj", "{BAE25C5B-4921-4614-B6F9-276513295B30}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FeedService", "FeedService", "{C1A1A803-C1B0-467D-A6D3-B08D27FFAB0C}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedService", "FeedService\FeedService\FeedService.csproj", "{6B2CD48F-D33C-4D11-AB43-1A62ACFBA1A5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedServiceTests", "FeedService\FeedServiceTests\FeedServiceTests.csproj", "{61697E69-46DA-45F8-BE4C-C98302AE0E80}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B63B6CFF-B655-41AE-B303-DB050858904C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B63B6CFF-B655-41AE-B303-DB050858904C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B63B6CFF-B655-41AE-B303-DB050858904C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B63B6CFF-B655-41AE-B303-DB050858904C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAE25C5B-4921-4614-B6F9-276513295B30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE25C5B-4921-4614-B6F9-276513295B30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAE25C5B-4921-4614-B6F9-276513295B30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAE25C5B-4921-4614-B6F9-276513295B30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B2CD48F-D33C-4D11-AB43-1A62ACFBA1A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B2CD48F-D33C-4D11-AB43-1A62ACFBA1A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B2CD48F-D33C-4D11-AB43-1A62ACFBA1A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B2CD48F-D33C-4D11-AB43-1A62ACFBA1A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61697E69-46DA-45F8-BE4C-C98302AE0E80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61697E69-46DA-45F8-BE4C-C98302AE0E80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61697E69-46DA-45F8-BE4C-C98302AE0E80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61697E69-46DA-45F8-BE4C-C98302AE0E80}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B63B6CFF-B655-41AE-B303-DB050858904C} = {CF0699EB-8EA6-409F-9C73-842C04A3F926}
+		{BAE25C5B-4921-4614-B6F9-276513295B30} = {CF0699EB-8EA6-409F-9C73-842C04A3F926}
+		{6B2CD48F-D33C-4D11-AB43-1A62ACFBA1A5} = {C1A1A803-C1B0-467D-A6D3-B08D27FFAB0C}
+		{61697E69-46DA-45F8-BE4C-C98302AE0E80} = {C1A1A803-C1B0-467D-A6D3-B08D27FFAB0C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E880FA6-1D51-499C-BA6F-9E8A15A0CF4F}
+	EndGlobalSection
+EndGlobal
