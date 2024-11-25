@@ -3,12 +3,16 @@
 ## Overview
 The Norce Feed Builder is a streamlined solution designed to consolidate product data from multiple markets into a unified feed. This system integrates with Norce's Channel Feed to fetch product information and transforms it into a format suitable for Datafeedwatch consumption, storing the results in Azure Blob Storage.
 
+## Documentation Location
+All documentation will be maintained in the [Callisto Backend Applications](https://partnersense.atlassian.net/wiki/spaces/CL/pages/877002753/Callisto+Backend+Applications) space and its subpages.
+
 ## Core Objectives
 - Simple setup process for new customers
 - Efficient handling of market-specific product attributes
 - Cost-effective approach using single SKU with market-specific properties
 - Easy maintenance and monitoring
 - Maximum 3-day setup timeline for new customers
+- Leverage existing codebase
 
 ## System Architecture
 
@@ -26,9 +30,9 @@ The Norce Feed Builder is a streamlined solution designed to consolidate product
    - Daily feed generation and updates
 
 4. **Logging & Monitoring**
-   - Serilog integration
-   - Elastic Search for log aggregation
-   - Elastic Search alerts for error monitoring
+   - ELK Stack for logging
+   - Alert configuration through ELK/Azure
+   - UptimeRobot for health checks
 
 ### Data Flow
 ```mermaid
@@ -54,7 +58,7 @@ graph TD
    - Key Vault setup
    - Blob Storage configuration
    - App Configuration
-   - Logging infrastructure
+   - ELK Stack setup
 
 2. Application Configuration
    - Norce Channel Feed access
@@ -63,9 +67,9 @@ graph TD
    - Scheduled job timing
 
 ### Error Handling
-- Basic retry mechanism for API calls
-- Logging of all errors and warnings
-- Elastic Search alerts for critical failures
+- Logging through ELK Stack
+- Alerts configured in ELK/Azure
+- UptimeRobot monitoring
 
 ## Documentation Requirements
 
@@ -88,19 +92,20 @@ graph TD
 ## Monitoring and Maintenance
 
 ### Health Checks
+- UptimeRobot monitoring
 - Feed generation status
 - Channel Feed connectivity
 - Storage availability
-- Log monitoring
+- ELK log monitoring
 - Error rate tracking
 
 ## Development and Deployment
 
 ### Development Guidelines
-- Code organization
-- Logging standards
+- Code organization based on existing codebase
+- Logging standards using ELK
 - Error handling patterns
-- Testing requirements
+- Comprehensive unit testing focus
 
 ### Deployment Process
 - GitHub workflows for CI/CD
@@ -114,8 +119,7 @@ graph TD
 - Logging security events
 
 ## Testing Strategy
-- Unit tests for core functionality
-- Integration tests for API communication
+- Comprehensive unit test coverage
 - Feed validation tests
 - Market-specific attribute testing
 
@@ -123,5 +127,6 @@ graph TD
 - Successful daily feed generation
 - Proper market-specific attribute handling
 - Error-free Datafeedwatch integration
-- Complete documentation
-- Functional monitoring system
+- Complete documentation in Callisto Backend space
+- Functional monitoring system with UptimeRobot
+- Comprehensive unit test coverage
