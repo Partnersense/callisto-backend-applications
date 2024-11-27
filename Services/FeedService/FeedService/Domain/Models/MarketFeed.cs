@@ -1,6 +1,6 @@
-﻿using FeedService.Domain.DataFeedWatch;
+﻿using FeedService.Domain.DTOs.External.DataFeedWatch;
 
-namespace FeedService.Domain;
+namespace FeedService.Domain.Models;
 
 public class MarketFeed
 {

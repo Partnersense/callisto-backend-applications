@@ -1,4 +1,4 @@
-﻿namespace FeedService.Domain.DataFeedWatch;
+﻿namespace FeedService.Domain.DTOs.External.DataFeedWatch;
 
 public class GenericFeedProductDto
 {
