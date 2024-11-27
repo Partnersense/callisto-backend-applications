@@ -22,4 +22,7 @@ public class ElasticLoggingModuleOptions
 
     [StringLength(100, MinimumLength = 1, ErrorMessage = "Application Namespace length can't be more than 100.")]
     public required string ApplicationNamespace { get; init; }
+
+    [Required]
+    public bool RunElasticLocally { get; init; } = false;
 }

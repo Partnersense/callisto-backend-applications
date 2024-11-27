@@ -24,37 +24,43 @@ public static class LoggingConfiguration
     /// <param name="blobLoggingOptions">Optional options for Azure Blob logging. If no parameter is passed, logging to blob will not be added.</param>
     public static void AddDefaultLogging(this WebApplicationBuilder builder, ElasticLoggingModuleOptions elasticLoggingOptions, AzureBlobLoggingModuleOptions? blobLoggingOptions = null)
     {
+       
+
         // Add console logging
         var loggerConfiguration = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Console();
 
-        if (elasticLoggingOptions == null) throw new ArgumentNullException(nameof(elasticLoggingOptions));
+        if (elasticLoggingOptions.RunElasticLocally)
+        {
+            if (elasticLoggingOptions == null) throw new ArgumentNullException(nameof(elasticLoggingOptions));
 
-        if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticCloudId))
-            throw new ArgumentException("ElasticCloudId must not be null or empty", nameof(elasticLoggingOptions.ElasticCloudId));
-        if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticUser))
-            throw new ArgumentException("ElasticUser must not be null or empty", nameof(elasticLoggingOptions.ElasticUser));
-        if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticPassword))
-            throw new ArgumentException("ElasticPassword must not be null or empty", nameof(elasticLoggingOptions.ElasticPassword));
+            if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticCloudId))
+                throw new ArgumentException("ElasticCloudId must not be null or empty", nameof(elasticLoggingOptions.ElasticCloudId));
+            if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticUser))
+                throw new ArgumentException("ElasticUser must not be null or empty", nameof(elasticLoggingOptions.ElasticUser));
+            if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticPassword))
+                throw new ArgumentException("ElasticPassword must not be null or empty", nameof(elasticLoggingOptions.ElasticPassword));
 
-        // Add Elastic Cloud logging
-        loggerConfiguration.WriteTo.ElasticCloud(elasticLoggingOptions.ElasticCloudId, elasticLoggingOptions.ElasticUser,
-                elasticLoggingOptions.ElasticPassword, opts =>
-                {
-                    opts.MinimumLevel = LogEventLevel.Debug;
-                    opts.TextFormatting = new EcsTextFormatterConfiguration<EcsDocument>();
-                    opts.DataStream = new DataStreamName(elasticLoggingOptions.ApplicationName,
-                        elasticLoggingOptions.ApplicationNamespace, elasticLoggingOptions.ApplicationType);
-                    opts.BootstrapMethod = BootstrapMethod.Failure;
-                    opts.ConfigureChannel = channelOpts =>
+            // Add Elastic Cloud logging
+            loggerConfiguration.WriteTo.ElasticCloud(elasticLoggingOptions.ElasticCloudId, elasticLoggingOptions.ElasticUser,
+                    elasticLoggingOptions.ElasticPassword, opts =>
                     {
-                        channelOpts.BufferOptions = new BufferOptions
+                        opts.MinimumLevel = LogEventLevel.Debug;
+                        opts.TextFormatting = new EcsTextFormatterConfiguration<EcsDocument>();
+                        opts.DataStream = new DataStreamName(elasticLoggingOptions.ApplicationName,
+                            elasticLoggingOptions.ApplicationNamespace, elasticLoggingOptions.ApplicationType);
+                        opts.BootstrapMethod = BootstrapMethod.Failure;
+                        opts.ConfigureChannel = channelOpts =>
                         {
-                            ExportMaxRetries = 10
+                            channelOpts.BufferOptions = new BufferOptions
+                            {
+                                ExportMaxRetries = 10
+                            };
                         };
-                    };
-                });
+                    });
+        }
+
 
         // Add Azure Blob logging only if blobLoggingOptions is provided
         if (blobLoggingOptions != null && builder.Environment.IsProduction())
