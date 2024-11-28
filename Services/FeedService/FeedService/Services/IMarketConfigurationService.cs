@@ -7,7 +7,7 @@ namespace FeedService.Services
         /// <summary>
         /// Gets all available markets and their configurations
         /// </summary>
-        Task<IEnumerable<MarketConfiguration>> GetMarketConfigurations();
+        Task<List<MarketConfiguration>> GetMarketConfigurations(Guid? traceId = null);
 
        
     }

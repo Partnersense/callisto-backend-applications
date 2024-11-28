@@ -7,6 +7,8 @@ using SharedLib.Services;
 using SharedLib.Options.Models;
 using SharedLib.Jobs;
 using SharedLib.Options.Models.Logging;
+using Elastic.CommonSchema;
+using FeedService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +70,7 @@ if (!builder.Environment.IsDevelopment() || hangfireOptions!.RunHangfireLocally)
 #region Services
 
 builder.Services.AddTransient<IStorageService, StorageService>();
-
+builder.Services.AddTransient<IMarketConfigurationService, MarketConfigurationService>();
 builder.Services.AddTransient<IJob, FeedBuilder>();
 builder.Services.AddHostedService<Worker>();
 

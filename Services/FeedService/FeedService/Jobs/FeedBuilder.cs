@@ -14,6 +14,8 @@ using FeedService.Domain.DTOs.External.DataFeedWatch;
 using FeedService.Domain.Models;
 using FeedService.Domain.Norce;
 using FeedService.Domain.Validation;
+using FeedService.Services;
+using Hangfire;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Options;
 using SharedLib.Clients.Norce;
@@ -33,19 +35,23 @@ public class FeedBuilder(
     IOptionsMonitor<NorceBaseModuleOptions> norceOptions, 
     IOptionsMonitor<BaseModuleOptions> baseOptions, 
     IConfigurationRefresher configurationRefresher, 
-    INorceClient norceClient, 
+    INorceClient norceClient,
+    IMarketConfigurationService marketConfiguration,
     IStorageService storageService) : JobBase<FeedBuilder>(logger)
 {
     private readonly ILogger<FeedBuilder> _logger = logger;
 
     public override async Task Execute(CancellationToken cancellationToken)
     {
+        var traceId = Guid.NewGuid();
+
         await configurationRefresher.TryRefreshAsync(cancellationToken);
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        var markets = new[] { LanguageConstants.Market.USA, LanguageConstants.Market.Europe, LanguageConstants.Market.Sweden };
-        var feeds = markets.Select(market => new MarketFeed { Market = market, Products = [] }).ToList();
+        var markets = await marketConfiguration.GetMarketConfigurations(traceId);
+
+        var feeds = markets.Select(market => new MarketFeed { Market = market.MarketCode, Products = [] }).ToList();
 
         // Stream Norce full feed and map to feed object
         await foreach (var product in norceClient.ProductFeed.StreamProductFeedAsync(feedOptions.CurrentValue.ChannelKey, null, cancellationToken))
