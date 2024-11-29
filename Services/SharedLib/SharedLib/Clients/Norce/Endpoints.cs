@@ -102,6 +102,7 @@ public static class Endpoints
             public const string ClientManufacturers = $"{Base}Application/ClientManufacturers";
             public const string ClientPriceLists = $"{Base}Application/ClientPriceLists";
             public const string ClientSuppliers = $"{Base}Application/ClientSuppliers";
+            public const string ClientSalesAreas = $"{Base}Application/SalesAreas";
             public const string ClientWarehouses = $"{Base}Application/ClientWarehouses";
             public const string CustomerInfoTypes = $"{Base}Application/CustomerInfoTypes";
             public const string FileInfos = $"{Base}Application/FileInfos";

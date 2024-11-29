@@ -9,38 +9,35 @@ using System.Threading.Tasks;
 namespace SharedLib.Models.Norce.Query
 {
     /// <summary>
-    /// Represents a client culture from the Norce API.
-    /// GET /Application/ClientCultures
+    /// Represents a client sales area from the Norce API.
+    /// GET /Application/SalesAreas
     /// </summary>
     /// <example>
     /// {
-    ///      "CultureCode": "en-GB",
+    ///      "SalesAreaId": 1,
     ///      "ClientId": 1006,
-    ///      "IsPrimary": false,
-    ///      "Created": "2024-10-17T08:12:10.477Z",
-    ///      "CreatedBy": 1195,
-    ///      "Updated": null,
-    ///      "UpdatedBy": null,
-    ///      "Collation": null
+    ///      "IsPrimary": true,
+    ///      "Created": "2024-02-20T15:30:01.477Z",
+    ///      "CreatedBy": 9,
+    ///      "Updated": "2024-08-20T11:21:16.15Z",
+    ///      "UpdatedBy": 1035,
+    ///      "Code": "SE"
     /// }
     /// </example>
-    public class ClientCulture
+    public class SalesAreaResponse
     {
         /// <summary>
-        /// CultureCode. MaxLength: 16. Key property. 
+        /// The unique identifier for the sales area. Key property.
         /// <br/><br/>
         /// Example Values:
-        /// "en-US", 
-        /// "nb-NO",
-        /// "sv-SE"
+        /// "1"
         /// </summary>
-        [StringLength(16)]
         [Required]
-        [JsonPropertyName("cultureCode")]
-        public string CultureCode { get; init; } = string.Empty;
+        [JsonPropertyName("salesAreaId")]
+        public int SalesAreaId { get; init; }
 
         /// <summary>
-        /// ClientId.
+        /// Client identifier.
         /// <br/><br/>
         /// Example Values:
         /// "1006"
@@ -50,62 +47,64 @@ namespace SharedLib.Models.Norce.Query
         public int ClientId { get; init; }
 
         /// <summary>
-        /// IsPrimary.
+        /// Indicates if this is the primary sales area.
         /// <br/><br/>
         /// Example Values:
-        /// "false"
+        /// "true"
         /// </summary>
         [Required]
         [JsonPropertyName("isPrimary")]
         public bool IsPrimary { get; init; }
 
         /// <summary>
-        /// Created.
+        /// Creation timestamp.
         /// <br/><br/>
         /// Example Values:
-        /// "2024-10-17T08:12:10.477Z"
+        /// "2024-02-20T15:30:01.477Z"
         /// </summary>
         [Required]
         [JsonPropertyName("created")]
         public DateTime Created { get; init; }
 
         /// <summary>
-        /// CreatedBy.
+        /// Identifier of the user who created the sales area.
         /// <br/><br/>
         /// Example Values:
-        /// "1195"
+        /// "9"
         /// </summary>
         [Required]
         [JsonPropertyName("createdBy")]
         public int CreatedBy { get; init; }
 
         /// <summary>
-        /// Updated. Nullable.
+        /// Last update timestamp. Nullable.
         /// <br/><br/>
         /// Example Values:
         /// "null"
-        /// "2024-10-17T08:12:10.477Z"
+        /// "2024-08-20T11:21:16.15Z"
         /// </summary>
         [JsonPropertyName("updated")]
         public DateTime? Updated { get; init; }
 
         /// <summary>
-        /// UpdatedBy. Nullable.
+        /// Identifier of the user who last updated the sales area. Nullable.
         /// <br/><br/>
         /// Example Values:
         /// "null"
-        /// "1195"
+        /// "1035"
         /// </summary>
         [JsonPropertyName("updatedBy")]
         public int? UpdatedBy { get; init; }
 
         /// <summary>
-        /// Collation. MaxLength: 128. Nullable.
+        /// The sales area code. MaxLength: 50. Nullable.
         /// <br/><br/>
         /// Example Values:
+        /// "SE"
         /// </summary>
-        [StringLength(128)]
-        [JsonPropertyName("collation")]
-        public string? Collation { get; init; }
+        [StringLength(50)]
+        [JsonPropertyName("code")]
+        public string? Code { get; init; }
     }
+}
 }

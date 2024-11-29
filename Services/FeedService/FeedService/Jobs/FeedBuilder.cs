@@ -36,7 +36,7 @@ public class FeedBuilder(
     IOptionsMonitor<BaseModuleOptions> baseOptions, 
     IConfigurationRefresher configurationRefresher, 
     INorceClient norceClient,
-    IMarketConfigurationService marketConfiguration,
+    ICultureConfigurationService marketConfiguration,
     IStorageService storageService) : JobBase<FeedBuilder>(logger)
 {
     private readonly ILogger<FeedBuilder> _logger = logger;
@@ -49,7 +49,7 @@ public class FeedBuilder(
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        var markets = await marketConfiguration.GetMarketConfigurations(traceId);
+        var markets = await marketConfiguration.GetCultureConfigurations(traceId);
 
         var feeds = markets.Select(market => new MarketFeed { Market = market.MarketCode, Products = [] }).ToList();
 

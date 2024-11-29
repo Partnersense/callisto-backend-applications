@@ -70,7 +70,7 @@ if (!builder.Environment.IsDevelopment() || hangfireOptions!.RunHangfireLocally)
 #region Services
 
 builder.Services.AddTransient<IStorageService, StorageService>();
-builder.Services.AddTransient<IMarketConfigurationService, MarketConfigurationService>();
+builder.Services.AddTransient<ICultureConfigurationService, CultureConfigurationService>();
 builder.Services.AddTransient<IJob, FeedBuilder>();
 builder.Services.AddHostedService<Worker>();
 
