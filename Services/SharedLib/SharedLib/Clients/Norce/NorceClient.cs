@@ -20,7 +20,7 @@ public class NorceClient : INorceClient
     public int UserId { get; }
     public INorceConnectClient Connect { get; }
     public NorceApiClient Api { get; }
-    public NorceQueryClient Query { get; }
+    public INorceQueryClient Query { get; }
     public INorceFeedClient ProductFeed { get; }
 
     public NorceClient(ILogger<NorceClient> logger, IHttpClientFactory httpClientFactory, INorceRetryPolicy norceRetry, IOptionsMonitor<NorceBaseModuleOptions> norceConfig, INorceConnectClient? connectClient = null, INorceFeedClient? productFeedClient = null)

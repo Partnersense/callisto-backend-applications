@@ -8,7 +8,8 @@ using SharedLib.Options.Models;
 using SharedLib.Jobs;
 using SharedLib.Options.Models.Logging;
 using Elastic.CommonSchema;
-using FeedService.Services;
+using FeedService.Services.SalesAreaConfigurationServices;
+using FeedService.Services.CultureConfigurationServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,6 +72,7 @@ if (!builder.Environment.IsDevelopment() || hangfireOptions!.RunHangfireLocally)
 
 builder.Services.AddTransient<IStorageService, StorageService>();
 builder.Services.AddTransient<ICultureConfigurationService, CultureConfigurationService>();
+builder.Services.AddTransient<ISalesAreaConfigurationService, SalesAreaConfigurationService>();
 builder.Services.AddTransient<IJob, FeedBuilder>();
 builder.Services.AddHostedService<Worker>();
 

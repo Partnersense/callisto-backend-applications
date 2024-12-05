@@ -15,7 +15,7 @@ namespace FeedService.Domain.Models
     ///     CurrencyCode = "USD"
     /// };
     /// </example>
-    public class MarketConfiguration
+    public class CultureConfiguration
     {
         /// <summary>
         /// The unique identifier code for the market (e.g., "US", "EU", "SE").

@@ -19,7 +19,7 @@ namespace SharedLib.Models.Norce.Query
         /// Example Values:
         /// 1
         /// </summary>
-        public int? PriceListId { get; set; }
+        public int PriceListId { get; set; }
 
         /// <summary>
         /// The client ID associated with this price list.

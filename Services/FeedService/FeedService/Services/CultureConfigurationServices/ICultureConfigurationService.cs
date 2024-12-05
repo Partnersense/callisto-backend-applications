@@ -1,14 +1,14 @@
 ﻿using FeedService.Domain.Models;
 
-namespace FeedService.Services
+namespace FeedService.Services.CultureConfigurationServices
 {
     public interface ICultureConfigurationService
     {
         /// <summary>
         /// Gets all available markets and their configurations
         /// </summary>
-        Task<List<MarketConfiguration>> GetCultureConfigurations(Guid? traceId = null);
+        Task<List<CultureConfiguration>> GetCultureConfigurations(Guid? traceId = null);
 
-       
+
     }
 }

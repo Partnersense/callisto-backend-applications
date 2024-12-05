@@ -107,4 +107,4 @@ namespace SharedLib.Models.Norce.Query
         public string? Code { get; init; }
     }
 }
-}
+

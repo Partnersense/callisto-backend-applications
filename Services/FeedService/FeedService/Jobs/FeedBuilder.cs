@@ -14,7 +14,9 @@ using FeedService.Domain.DTOs.External.DataFeedWatch;
 using FeedService.Domain.Models;
 using FeedService.Domain.Norce;
 using FeedService.Domain.Validation;
-using FeedService.Services;
+using FeedService.Services.CultureConfigurationServices;
+using FeedService.Services.CultureFeedGenerationServices;
+using FeedService.Services.SalesAreaConfigurationServices;
 using Hangfire;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Options;
@@ -36,7 +38,9 @@ public class FeedBuilder(
     IOptionsMonitor<BaseModuleOptions> baseOptions, 
     IConfigurationRefresher configurationRefresher, 
     INorceClient norceClient,
-    ICultureConfigurationService marketConfiguration,
+    ICultureConfigurationService cultureConfigurationSerivce,
+    ISalesAreaConfigurationService salesAreaConfigurationService,
+    ICultureFeedGenerationService cultureFeedGenerationService,
     IStorageService storageService) : JobBase<FeedBuilder>(logger)
 {
     private readonly ILogger<FeedBuilder> _logger = logger;
@@ -49,18 +53,30 @@ public class FeedBuilder(
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        var markets = await marketConfiguration.GetCultureConfigurations(traceId);
+        var cultures = await cultureConfigurationSerivce.GetCultureConfigurations(traceId);
+        var salesAreas = await salesAreaConfigurationService.GetSalesAreaConfigurations(traceId);
 
-        var feeds = markets.Select(market => new MarketFeed { Market = market.MarketCode, Products = [] }).ToList();
+        var feedWithCulturesNotPrice = await cultureFeedGenerationService.GenerateFeedWithCultures(cultures);
+
+        await GenerateFeed(cultures, salesAreas, cancellationToken);
+
+        stopwatch.Stop();
+
+        _logger.LogDebug("Time for all feeds to be fetched and processed: {TimeInSeconds} seconds", stopwatch.Elapsed.TotalSeconds);
+    }
+
+    private async Task GenerateFeed(List<CultureConfiguration> cultures, List<SalesAreaConfiguration> salesAreas, CancellationToken cancellationToken)
+    {
+        var feeds = cultures.Select(market => new MarketFeed { Market = market.MarketCode, Products = [] }).ToList();
 
         // Stream Norce full feed and map to feed object
         await foreach (var product in norceClient.ProductFeed.StreamProductFeedAsync(feedOptions.CurrentValue.ChannelKey, null, cancellationToken))
 
-        foreach (var feed in feeds)
-        {
-            if (product != null)
-                feed.Products.AddRange(MapToFeedProducts(product, feed.Market));
-        }
+            foreach (var feed in feeds)
+            {
+                if (product != null)
+                    feed.Products.AddRange(MapToFeedProducts(product, feed.Market));
+            }
 
         var containerExists = await storageService.CreateStorageContainer(cancellationToken);
         if (containerExists)
@@ -85,10 +101,6 @@ public class FeedBuilder(
             else
                 _logger.LogError("Error uploading feed to blob storage.");
         }
-
-        stopwatch.Stop();
-
-        _logger.LogDebug("Time for all feeds to be fetched and processed: {TimeInSeconds} seconds", stopwatch.Elapsed.TotalSeconds);
     }
 
     /// <summary>

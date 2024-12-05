@@ -41,14 +41,13 @@ namespace FeedService.Domain.Models
         public string? CurrencyCode { get; init; }
 
         /// <summary>
-        /// The list of price list codes used for this sales area.
-        /// Maps to the specific price list configurations in the system.
+        /// The list of price list ids used for this sales area.
         /// <br/><br/>
         /// Example Values:
-        /// ["SE-STANDARD", "SE-CAMPAIGN"]
+        /// [2, 9]
         /// </summary>
         [Required]
-        public required List<string> PriceListCodes { get; init; } = [];
+        public required List<int> PriceListIds { get; init; } = [];
 
         /// <summary>
         /// Indicates if this is the primary sales area for the region.
