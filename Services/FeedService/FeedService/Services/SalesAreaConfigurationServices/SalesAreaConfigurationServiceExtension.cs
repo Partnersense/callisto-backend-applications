@@ -89,5 +89,70 @@ namespace FeedService.Services.SalesAreaConfigurationServices
                 throw ex;
             }
         }
+
+        /// <summary>
+        /// Filters a list of sales areas based on the included sales area IDs.
+        /// </summary>
+        /// <param name="salesAreas">List of sales areas to filter</param>
+        /// <param name="includedSalesAreaIds">List of sales area IDs to include in the result. If empty, returns all sales areas.</param>
+        /// <param name="_logger">Logger instance for tracking method execution</param>
+        /// <param name="traceId">Optional trace ID for logging and debugging purposes.</param>
+        /// <returns>A filtered list of sales areas that match the included sales area IDs</returns>
+        /// <exception cref="ArgumentNullException">Thrown when salesAreas parameter is null</exception>
+        public static List<SalesAreaResponse> FilterSalesAreasByIncludedIds(List<SalesAreaResponse> salesAreas, List<int> includedSalesAreaIds, ILogger _logger, Guid? traceId = null)
+        {
+            try
+            {
+                if (salesAreas == null)
+                    throw new ArgumentNullException(nameof(salesAreas));
+
+                if (includedSalesAreaIds == null || !includedSalesAreaIds.Any())
+                {
+                    _logger.LogInformation(
+                        "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message}",
+                        traceId,
+                        nameof(SalesAreaConfigurationServiceExtension),
+                        nameof(LoggingTypes.CheckpointLog),
+                        nameof(FilterSalesAreasByIncludedIds),
+                        "No sales area IDs filter specified, returning all sales areas"
+                    );
+                    return salesAreas;
+                }
+
+                var filteredSalesAreas = salesAreas
+                    .Where(sa => includedSalesAreaIds.Contains(sa.SalesAreaId))
+                    .ToList();
+
+                _logger.LogInformation(
+                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters TotalSalesAreas: {totalSalesAreas}, FilteredSalesAreas: {filteredSalesAreas}",
+                    traceId,
+                    nameof(SalesAreaConfigurationServiceExtension),
+                    nameof(LoggingTypes.CheckpointLog),
+                    nameof(FilterSalesAreasByIncludedIds),
+                    "Successfully filtered sales areas",
+                    salesAreas.Count,
+                    filteredSalesAreas.Count
+                );
+
+                return filteredSalesAreas;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Error Source: {errorSource} Error Message: {errorMessage} Error Stacktrace: {errorStackTrace} Error Inner Exception: {errorInnerException} Internal Message: {internalMessage}",
+                    traceId,
+                    nameof(SalesAreaConfigurationServiceExtension),
+                    nameof(LoggingTypes.ErrorLog),
+                    nameof(FilterSalesAreasByIncludedIds),
+                    ex.Source,
+                    ex.Message,
+                    ex.StackTrace,
+                    ex.InnerException,
+                    "An unexpected error occurred while filtering sales areas"
+                );
+                throw;
+            }
+        }
     }
 }

@@ -16,6 +16,7 @@ namespace FeedService.Services.CultureConfigurationServices
     public class CultureConfigurationService(
         ILogger<CultureConfigurationService> _logger,
         INorceClient _norceClient,
+        IOptionsMonitor<BaseModuleOptions> baseOptions,
         IOptionsMonitor<NorceBaseModuleOptions> _norceOptions) : ICultureConfigurationService
     {
 
@@ -32,11 +33,14 @@ namespace FeedService.Services.CultureConfigurationServices
                     throw new ArgumentNullException(nameof(cultures));
 
 
+                //filter
+                var filteredCultures = CultureConfigurationServiceExtension.FilterCulturesByIncludedCodes(cultures, baseOptions.CurrentValue.IncludedCulturesList, _logger, traceId);
+
                 var marketConfigs = new List<CultureConfiguration>();
 
-                foreach (var culture in cultures)
+                foreach (var culture in filteredCultures)
                 {
-                    var config = await CultureConfigurationServiceExtension.MapCultureToMarketConfiguration(culture, _logger, traceId);
+                    var config = CultureConfigurationServiceExtension.MapCultureToMarketConfiguration(culture, _logger, traceId);
                     if (config != null)
                     {
                         marketConfigs.Add(config);

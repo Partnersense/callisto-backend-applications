@@ -291,5 +291,131 @@ namespace FeedServiceTests.Services.SalesAreaConfigurationServiceTests
                     It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
                 Times.AtLeast(1));
         }
+
+        [Fact]
+        public void FilterSalesAreasByIncludedIds_WithMatchingIds_ReturnsFilteredList()
+        {
+            // Arrange
+            var salesAreas = new List<SalesAreaResponse>
+            {
+                new() { SalesAreaId = 1, Code = "US" },
+                new() { SalesAreaId = 2, Code = "SE" },
+                new() { SalesAreaId = 3, Code = "NO" }
+            };
+
+            var includedIds = new List<int> { 1, 3 };
+
+            // Act
+            var result = SalesAreaConfigurationServiceExtension.FilterSalesAreasByIncludedIds(
+                salesAreas, includedIds, _loggerMock.Object, _testTraceId);
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, sa => sa.SalesAreaId == 1);
+            Assert.Contains(result, sa => sa.SalesAreaId == 3);
+            Assert.DoesNotContain(result, sa => sa.SalesAreaId == 2);
+        }
+
+        [Fact]
+        public void FilterSalesAreasByIncludedIds_WithEmptyIncludedIds_ReturnsAllSalesAreas()
+        {
+            // Arrange
+            var salesAreas = new List<SalesAreaResponse>
+            {
+                new() { SalesAreaId = 1, Code = "US" },
+                new() { SalesAreaId = 2, Code = "SE" }
+            };
+
+            var emptyIncludedIds = new List<int>();
+
+            // Act
+            var result = SalesAreaConfigurationServiceExtension.FilterSalesAreasByIncludedIds(
+                salesAreas, emptyIncludedIds, _loggerMock.Object, _testTraceId);
+
+            // Assert
+            Assert.Equal(salesAreas.Count, result.Count);
+            Assert.Equal(salesAreas, result);
+        }
+
+        [Fact]
+        public void FilterSalesAreasByIncludedIds_WithNullIncludedIds_ReturnsAllSalesAreas()
+        {
+            // Arrange
+            var salesAreas = new List<SalesAreaResponse>
+            {
+                new() { SalesAreaId = 1, Code = "US" },
+                new() { SalesAreaId = 2, Code = "SE" }
+            };
+
+            // Act
+            var result = SalesAreaConfigurationServiceExtension.FilterSalesAreasByIncludedIds(
+                salesAreas, null, _loggerMock.Object, _testTraceId);
+
+            // Assert
+            Assert.Equal(salesAreas.Count, result.Count);
+            Assert.Equal(salesAreas, result);
+        }
+
+        [Fact]
+        public void FilterSalesAreasByIncludedIds_WithNullSalesAreas_ThrowsArgumentNullException()
+        {
+            // Arrange
+            List<SalesAreaResponse> nullSalesAreas = null;
+            var includedIds = new List<int> { 1, 2 };
+
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentNullException>(() =>
+                SalesAreaConfigurationServiceExtension.FilterSalesAreasByIncludedIds(
+                    nullSalesAreas, includedIds, _loggerMock.Object, _testTraceId));
+
+            Assert.Equal("salesAreas", exception.ParamName);
+        }
+
+        [Fact]
+        public void FilterSalesAreasByIncludedIds_WithNoMatchingIds_ReturnsEmptyList()
+        {
+            // Arrange
+            var salesAreas = new List<SalesAreaResponse>
+            {
+                new() { SalesAreaId = 1, Code = "US" },
+                new() { SalesAreaId = 2, Code = "SE" }
+            };
+
+            var nonMatchingIds = new List<int> { 3, 4 };
+
+            // Act
+            var result = SalesAreaConfigurationServiceExtension.FilterSalesAreasByIncludedIds(
+                salesAreas, nonMatchingIds, _loggerMock.Object, _testTraceId);
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void FilterSalesAreasByIncludedIds_VerifyLoggingOnSuccess()
+        {
+            // Arrange
+            var salesAreas = new List<SalesAreaResponse>
+            {
+                new() { SalesAreaId = 1, Code = "US" },
+                new() { SalesAreaId = 2, Code = "SE" }
+            };
+
+            var includedIds = new List<int> { 1 };
+
+            // Act
+            var result = SalesAreaConfigurationServiceExtension.FilterSalesAreasByIncludedIds(
+                salesAreas, includedIds, _loggerMock.Object, _testTraceId);
+
+            // Assert
+            _loggerMock.Verify(
+                x => x.Log(
+                    LogLevel.Information,
+                    It.IsAny<EventId>(),
+                    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Successfully filtered sales areas")),
+                    null,
+                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+                Times.Once);
+        }
     }
 }

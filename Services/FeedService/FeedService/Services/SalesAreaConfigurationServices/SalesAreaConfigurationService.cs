@@ -15,7 +15,7 @@ namespace FeedService.Services.SalesAreaConfigurationServices
     public class SalesAreaConfigurationService(
         ILogger<SalesAreaConfigurationService> _logger,
         INorceClient _norceClient,
-        IOptionsMonitor<NorceBaseModuleOptions> _norceOptions) : ISalesAreaConfigurationService
+        IOptionsMonitor<NorceBaseModuleOptions> _norceOptions, IOptionsMonitor<BaseModuleOptions> _baseOptions) : ISalesAreaConfigurationService
     {
         public async Task<List<SalesAreaConfiguration>> GetSalesAreaConfigurations(Guid? traceId = null)
         {
@@ -51,10 +51,11 @@ namespace FeedService.Services.SalesAreaConfigurationServices
                     throw new ArgumentNullException(nameof(currencies));
 
 
+                var filteredSalesArea = SalesAreaConfigurationServiceExtension.FilterSalesAreasByIncludedIds(salesAreas, _baseOptions.CurrentValue.IncludedSalesAreaIdsList, _logger, traceId);
 
                 var salesAreaConfigs = new List<SalesAreaConfiguration>();
 
-                foreach (var salesArea in salesAreas)
+                foreach (var salesArea in filteredSalesArea)
                 {
                     var config = SalesAreaConfigurationServiceExtension.MapSalesAreaToSalesAreaConfiguration(salesArea, priceLists, currencies, _logger, traceId);
                     if (config != null)
