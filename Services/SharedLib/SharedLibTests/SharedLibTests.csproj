@@ -27,8 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ERP.Master.Integration\ERP.Master.Integration\Erp.Master.Integration.csproj" />
-    <ProjectReference Include="..\SharedLib\SharedLib.csproj" />
+	  <ProjectReference Include="..\SharedLib\SharedLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

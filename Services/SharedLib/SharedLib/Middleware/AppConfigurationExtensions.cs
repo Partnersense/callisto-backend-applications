@@ -107,8 +107,9 @@ public static class AppConfigurationExtensions
                 .ConfigureRefresh(refreshOptions =>
                     refreshOptions.Register("Sentinel", environmentName, true)
                         .SetCacheExpiration(TimeSpan.FromMinutes(azureAppConfigurationRefreshInMinutes)));
+            Console.WriteLine("Debug: Successfully connected to Azure App Configuration");
 
-            refresher = options.GetRefresher();
+        refresher = options.GetRefresher();
         });
 
         builder.Services.AddAzureAppConfiguration();
