@@ -55,7 +55,7 @@ public interface INorceClient
     /// <summary>
     /// Gets the client for the Norce Query API.
     /// </summary>
-    NorceQueryClient Query { get; }
+    INorceQueryClient Query { get; }
 
     /// <summary>
     /// Gets the client for the Norce Feed API.

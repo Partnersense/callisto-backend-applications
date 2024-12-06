@@ -10,10 +10,15 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using FeedService.Constants;
-using FeedService.Domain;
-using FeedService.Domain.DataFeedWatch;
+using FeedService.Domain.DTOs.External.DataFeedWatch;
+using FeedService.Domain.Models;
 using FeedService.Domain.Norce;
 using FeedService.Domain.Validation;
+using FeedService.Services.CultureConfigurationServices;
+using FeedService.Services.CultureFeedGenerationServices;
+using FeedService.Services.PriceFeedGenerationServices;
+using FeedService.Services.SalesAreaConfigurationServices;
+using Hangfire;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Options;
 using SharedLib.Clients.Norce;
@@ -33,28 +38,63 @@ public class FeedBuilder(
     IOptionsMonitor<NorceBaseModuleOptions> norceOptions, 
     IOptionsMonitor<BaseModuleOptions> baseOptions, 
     IConfigurationRefresher configurationRefresher, 
-    INorceClient norceClient, 
+    INorceClient norceClient,
+    ICultureConfigurationService cultureConfigurationSerivce,
+    ISalesAreaConfigurationService salesAreaConfigurationService,
+    ICultureFeedGenerationService cultureFeedGenerationService,
+    IPriceFeedGenerationService priceFeedGenerationService,
     IStorageService storageService) : JobBase<FeedBuilder>(logger)
 {
     private readonly ILogger<FeedBuilder> _logger = logger;
 
     public override async Task Execute(CancellationToken cancellationToken)
     {
+
+        // I want the feed builder class to only include a execute method that calls other classes, i do not want logic in this class, its not as neat and easely tested.
+        // I want each separate logic to be in its own class so that it is easier to maintain, and switch out to a newer class in the future with the same interface, error tracing and so forth.
+
+        // I have implemented more extensive logs in the services I have created, see examples in CultureConfigurationServiceExtension the logs are long yes, but they are in a 
+        // in a format to make it easier to filter and make dashboards in elastic later on, make sure to use traceId in all methods to make it easier to filter out logs for
+        // differet runs, this to make error searching in prod a lot easier, see examples of error handling and error logs in the CultureConfigurationServiceExtension aswelll
+        var traceId = Guid.NewGuid();
+
         await configurationRefresher.TryRefreshAsync(cancellationToken);
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        var markets = new[] { LanguageConstants.Market.USA, LanguageConstants.Market.Europe, LanguageConstants.Market.Sweden };
-        var feeds = markets.Select(market => new MarketFeed { Market = market, Products = [] }).ToList();
+
+        // Get cultures and sales areas with filters.
+        var cultures = await cultureConfigurationSerivce.GetCultureConfigurations(traceId);
+        var salesAreas = await salesAreaConfigurationService.GetSalesAreaConfigurations(traceId);
+
+        // TODO: Generate feed with culture attributes, does not include price logic (resuse as much code from the old MapToFeedProducts method as possible, refine if possible)
+        var feedWithCulturesNotPrice = await cultureFeedGenerationService.GenerateFeedWithCultures(cultures, traceId);
+
+        // TODO: Add PriceLogic to the cuture feed (the best way to do it is the question), all product price logic needs to be fetched per sales area to get best price per sales area (pricelist seeds are in saleare object and is enriched in the GetSalesAreaConfigurations method)
+        var feedWithCulturesAndPrice = await priceFeedGenerationService.GenerateFeedWithPrices(feedWithCulturesNotPrice, traceId);
+
+        // TODO: Upload to Azure Storage method, create this service prefeibly in the lib as this could be done very generlized
+
+
+        // old legacy method
+        await GenerateFeed(cultures, salesAreas, cancellationToken);
+        stopwatch.Stop();
+
+        _logger.LogDebug("Time for all feeds to be fetched and processed: {TimeInSeconds} seconds", stopwatch.Elapsed.TotalSeconds);
+    }
+
+    private async Task GenerateFeed(List<CultureConfiguration> cultures, List<SalesAreaConfiguration> salesAreas, CancellationToken cancellationToken)
+    {
+        var feeds = cultures.Select(market => new MarketFeed { Market = market.MarketCode, Products = [] }).ToList();
 
         // Stream Norce full feed and map to feed object
         await foreach (var product in norceClient.ProductFeed.StreamProductFeedAsync(feedOptions.CurrentValue.ChannelKey, null, cancellationToken))
 
-        foreach (var feed in feeds)
-        {
-            if (product != null)
-                feed.Products.AddRange(MapToFeedProducts(product, feed.Market));
-        }
+            foreach (var feed in feeds)
+            {
+                if (product != null)
+                    feed.Products.AddRange(MapToFeedProducts(product, feed.Market));
+            }
 
         var containerExists = await storageService.CreateStorageContainer(cancellationToken);
         if (containerExists)
@@ -79,10 +119,6 @@ public class FeedBuilder(
             else
                 _logger.LogError("Error uploading feed to blob storage.");
         }
-
-        stopwatch.Stop();
-
-        _logger.LogDebug("Time for all feeds to be fetched and processed: {TimeInSeconds} seconds", stopwatch.Elapsed.TotalSeconds);
     }
 
     /// <summary>

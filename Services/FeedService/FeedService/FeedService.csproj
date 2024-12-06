@@ -14,4 +14,10 @@
     <ProjectReference Include="..\..\SharedLib\SharedLib\SharedLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Domain\DTOs\Internal\" />
+    <Folder Include="Domain\Enums\" />
+    <Folder Include="Domain\Entities\" />
+  </ItemGroup>
+
 </Project>
