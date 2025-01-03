@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SharedLib.Options
@@ -50,6 +52,60 @@ namespace SharedLib.Options
                 .Select(n => n!.Value)
                 .ToList();
 
+        }
+
+        /// <summary>
+        /// Parses a delimited string of market-specific URLs into key-value pairs.
+        /// Format: "en-US;www.example.com/en/path|sv-SE;www.example.com/sv/path"
+        /// </summary>
+        /// <param name="urlString">The delimited string containing market URLs</param>
+        /// <param name="traceId">Optional trace ID for logging and debugging purposes</param>
+        /// <returns>A Dictionary with market codes as keys and URLs as values</returns>
+        /// <exception cref="ArgumentException">Thrown when input string is malformed</exception>
+        /// <example>
+        /// Input: "en-US;www.example.com/en/path|sv-SE;www.example.com/sv/path"
+        /// Output: Dictionary { {"en-US", "www.example.com/en/path"}, {"sv-SE", "www.example.com/sv/path"} }
+        /// </example>
+        public static Dictionary<string, string> ConvertPipeAndQuotesListToDictionary(string urlString)
+        {
+            if (string.IsNullOrWhiteSpace(urlString))
+                return new Dictionary<string, string>();
+
+            var marketUrls = new Dictionary<string, string>();
+
+            // Split by market segments
+            var marketSegments = urlString.Split('|', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var segment in marketSegments)
+            {
+                // Split each segment into market code and URL
+                var parts = segment.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length != 2)
+                    throw new ArgumentException($"Invalid market URL format in segment: {segment}");
+
+                var marketCode = parts[0].Trim();
+                var url = parts[1].Trim();
+
+                // Validate market code format (e.g., en-US)
+                if (!IsValidMarketCode(marketCode))
+                    throw new ArgumentException($"Invalid market code format: {marketCode}");
+
+                marketUrls[marketCode] = url;
+            }
+
+            return marketUrls;
+        }
+
+        /// <summary>
+        /// Validates the format of a market code.
+        /// Valid format: two lowercase letters, followed by hyphen and two uppercase letters (e.g., en-US)
+        /// </summary>
+        /// <param name="marketCode">The market code to validate</param>
+        /// <returns>True if the market code is valid, false otherwise</returns>
+        private static bool IsValidMarketCode(string marketCode)
+        {
+            return Regex.IsMatch(marketCode, @"^[a-z]{2}-[A-Z]{2}$");
         }
     }
 }

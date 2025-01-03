@@ -2,25 +2,113 @@
 using FeedService.Services.SalesAreaConfigurationServices;
 using Microsoft.Extensions.Options;
 using SharedLib.Clients.Norce;
+using SharedLib.Logging.Enums;
 using SharedLib.Options.Models;
 
 namespace FeedService.Services.CultureFeedGenerationServices
 {
+    /// <summary>
+    /// Service responsible for fetching and generating feed data with culture-specific attributes.
+    /// Handles all external API calls and coordinates the data transformation process.
+    /// </summary>
     public class CultureFeedGenerationService(
-        ILogger<CultureFeedGenerationService> _logger,
-        INorceClient _norceClient,
-        IOptionsMonitor<NorceBaseModuleOptions> _norceOptions,
-        IOptionsMonitor<BaseModuleOptions> _baseOptions) : ICultureFeedGenerationService
+        ILogger<CultureFeedGenerationService> logger,
+        INorceClient norceClient,
+        IOptionsMonitor<NorceBaseModuleOptions> norceOptions,
+        IOptionsMonitor<NorceProductFeedModuleOptions> norceProductFeedOptions,
+        IOptionsMonitor<BaseModuleOptions> baseOptions)
+        : ICultureFeedGenerationService
     {
+        /// <summary>
+        /// Fetches product data from Norce and generates a feed with culture-specific attributes.
+        /// </summary>
+        /// <param name="cultures">List of culture configurations to process</param>
+        /// <param name="traceId">Unique identifier for request tracing</param>
+        /// <returns>A list of processed products with culture-specific attributes</returns>
+        /// <exception cref="ArgumentNullException">Thrown when cultures parameter is null</exception>
+        /// <exception cref="InvalidOperationException">Thrown when unable to process the feed</exception>
         public async Task<List<object>> GenerateFeedWithCultures(List<CultureConfiguration> cultures, Guid? traceId = null)
         {
+            try
+            {
+                logger.LogInformation(
+                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters Action: {action}",
+                    traceId,
+                    nameof(CultureFeedGenerationService),
+                    nameof(LoggingTypes.CheckpointLog),
+                    nameof(GenerateFeedWithCultures),
+                    "Starting feed generation with cultures",
+                    nameof(MethodActionLogTypes.Starting)
+                );
 
-            // This method should include minimal logic see other classes like SalesAreaConfigurationService.cs class that class and primary method only does requests and sends the logic to a static class in this cas the CultureFeedGenerationServiceExtension class,
-            // I think this is a neat way to keep logic from request, easier tested an in my opinion easier to maintain and read.  As the logic get to be pure logic. 
+                var processedProducts = new List<object>();
 
-            //The tests should be focused on the logic in the extension class, every method in the extension class needs test and docs very important for quality, readability and maintainability.
-            //Test with moqs for this class to test stuff like error handling of wrongfully requests. See example of test for service class and extension class in FeedServiceTests\Services\CultureConfigurationsServicesTests
-            throw new NotImplementedException();
+                // Fetch all products from Norce
+                await foreach (var product in norceClient.ProductFeed.StreamProductFeedAsync(norceProductFeedOptions.CurrentValue.ChannelKey, cancellationToken: default))
+                {
+                    if (product != null)
+                    {
+                        // Process each product for each culture
+                        foreach (var culture in cultures)
+                        {
+                            logger.LogInformation(
+                                "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters ProductCode: {productCode}, Culture: {culture}",
+                                traceId,
+                                nameof(CultureFeedGenerationService),
+                                nameof(LoggingTypes.CheckpointLog),
+                                nameof(GenerateFeedWithCultures),
+                                "Processing product for culture",
+                                product.Code,
+                                culture.CultureCode
+                            );
+
+                            var processedProduct = CultureFeedGenerationServiceExtension.MapProductForCulture(
+                                product,
+                                culture,
+                                norceOptions,
+                                baseOptions,
+                                logger,
+                                traceId);
+
+                            if (processedProduct != null)
+                            {
+                                processedProducts.Add(processedProduct);
+                            }
+                        }
+                    }
+                }
+
+                logger.LogInformation(
+                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters Action: {action}, ProductCount: {count}",
+                    traceId,
+                    nameof(CultureFeedGenerationService),
+                    nameof(LoggingTypes.CheckpointLog),
+                    nameof(GenerateFeedWithCultures),
+                    "Completed feed generation with cultures",
+                    nameof(MethodActionLogTypes.Completed),
+                    processedProducts.Count
+                );
+
+                return processedProducts;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(
+                    ex,
+                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Error Source: {errorSource} Error Message: {errorMessage} Error Stacktrace: {errorStackTrace} Error Inner Exception: {errorInnerException} Internal Message: {internalMessage} | Other Parameters CultureCount: {cultureCount}",
+                    traceId,
+                    nameof(CultureFeedGenerationService),
+                    nameof(LoggingTypes.ErrorLog),
+                    nameof(GenerateFeedWithCultures),
+                    ex.Source,
+                    ex.Message,
+                    ex.StackTrace,
+                    ex.InnerException,
+                    "Failed to generate culture feeds",
+                    cultures?.Count ?? 0
+                );
+                throw;
+            }
         }
     }
 }

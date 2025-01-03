@@ -63,7 +63,7 @@ public class FeedBuilder(
         stopwatch.Start();
 
 
-        // Get cultures and sales areas with filters.
+        // Get cultures and sales areas with filters. Filters are found in the config in azure
         var cultures = await cultureConfigurationSerivce.GetCultureConfigurations(traceId);
         var salesAreas = await salesAreaConfigurationService.GetSalesAreaConfigurations(traceId);
 
@@ -127,7 +127,7 @@ public class FeedBuilder(
     /// <param name="norceProduct"></param>
     /// <param name="market"></param>
     /// <returns></returns>
-    private IEnumerable<GenericFeedProductDto> MapToFeedProducts(NorceFeedProductDto norceProduct, string market)
+    private IEnumerable<DataFeedWatchDto> MapToFeedProducts(NorceFeedProductDto norceProduct, string market)
     {
         if (norceProduct.Variants is null || norceProduct.Variants.Count <= 0)
         {
@@ -135,7 +135,7 @@ public class FeedBuilder(
         }
 
 
-        var retVal = new List<GenericFeedProductDto>();
+        var retVal = new List<DataFeedWatchDto>();
         var (cultureCode, pricelistCode) = GetMarketValues(market);
 
         foreach (var variant in norceProduct.Variants)
@@ -161,7 +161,7 @@ public class FeedBuilder(
 
             var parametrics = GetParametrics(norceProduct, cultureCode);
 
-            var item = new GenericFeedProductDto
+            var item = new DataFeedWatchDto
             {
                 Id = variant.PartNo,
                 Title = title,
@@ -174,7 +174,7 @@ public class FeedBuilder(
                 Availability = GetAvailability((int)stock),
                 Category = category,
                 EanCode = variant.EanCode,
-                Flags = flags,
+                VariantFlags = flags,
                 Parametrics = parametrics
             };
 
@@ -373,7 +373,7 @@ public class FeedBuilder(
 
     private bool ProductAndVariantIsValid(NorceFeedProductDto product, NorceFeedVariant norceFeedVariant, string cultureCode, string pricelistCode)
     {
-        var variantValidator = new VariantValidator(pricelistCode, cultureCode);
+        var variantValidator = new VariantValidator( cultureCode);
         var productValidator = new ProductValidator(cultureCode);
 
         var productValidationResult = productValidator.Validate(product);

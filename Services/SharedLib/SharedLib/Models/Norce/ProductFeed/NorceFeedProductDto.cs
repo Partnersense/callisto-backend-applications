@@ -386,6 +386,9 @@ public class NorceFeedVariant
     [JsonPropertyName("endDate")] 
     public DateTime? EndDate { get; set; }
 
+    [JsonPropertyName("type")]
+    public string? Type { get; set; }
+
 
     public class OnHandRecord
     {

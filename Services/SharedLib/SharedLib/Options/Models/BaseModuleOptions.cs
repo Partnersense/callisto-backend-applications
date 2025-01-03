@@ -9,6 +9,7 @@ public class BaseModuleOptions
 {
     private string _includedCulturesString = "";
     private string _includedSalesAreaIdsString = "";
+    private string _cultureProductUrlString = "";
 
     /// <summary>
     /// The base site URL for the application
@@ -44,6 +45,20 @@ public class BaseModuleOptions
         }
     }
 
+    /// <summary>
+    /// Raw string value from configuration
+    /// Expected format: "en-US|sv-SE|nb-NO"
+    /// </summary>
+    public string CultureProductUrl
+    {
+        get => _cultureProductUrlString;
+        set
+        {
+            _cultureProductUrlString = value;
+            CultureProductUrlList = OptionsTypeConvertersExtension.ConvertPipeAndQuotesListToDictionary(value);
+        }
+    }
+
 
     /// <summary>
     /// List of culture codes to include in processing.
@@ -55,4 +70,9 @@ public class BaseModuleOptions
     /// List of sales area IDs to include in processing
     /// </summary>
     public List<int> IncludedSalesAreaIdsList {get; private set; } = [];
+
+    /// <summary>
+    /// List of sales area IDs to include in processing
+    /// </summary>
+    public Dictionary<string, string> CultureProductUrlList { get; private set; } = [];
 }
