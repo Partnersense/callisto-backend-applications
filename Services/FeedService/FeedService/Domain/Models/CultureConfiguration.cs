@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using FeedService.Domain.DTOs.External.DataFeedWatch;
 
 namespace FeedService.Domain.Models
 {
@@ -36,6 +37,14 @@ namespace FeedService.Domain.Models
         [StringLength(10, MinimumLength = 2, ErrorMessage = "Culture code must be between 2 and 10 characters")]
         [RegularExpression(@"^[a-z]{2}-[A-Z]{2}$", ErrorMessage = "Culture code must be in format 'xx-XX'")]
         public required string CultureCode { get; init; }
+
+        /// <summary>
+        /// List of products with correct culture translations where available  
+        /// </summary>
+        /// <example>en-US</example>
+        public List<DataFeedWatchDto> Products { get; set; } = [];
+
+
 
     }
 }

@@ -28,7 +28,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
         /// <returns>A list of processed products with culture-specific attributes</returns>
         /// <exception cref="ArgumentNullException">Thrown when cultures parameter is null</exception>
         /// <exception cref="InvalidOperationException">Thrown when unable to process the feed</exception>
-        public async Task<List<DataFeedWatchDto>> GenerateFeedWithCultures(List<CultureConfiguration> cultures, Guid? traceId = null)
+        public async Task<List<CultureConfiguration>> GenerateFeedWithCultures(List<CultureConfiguration> cultures, Guid? traceId = null)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
 
                             if (processedProduct != null)
                             {
-                                processedProducts.AddRange(processedProduct);
+                                culture.Products.AddRange(processedProduct);
                             }
                         }
                     }
@@ -90,7 +90,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
                     processedProducts.Count
                 );
 
-                return processedProducts;
+                return cultures;
             }
             catch (Exception ex)
             {

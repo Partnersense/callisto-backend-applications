@@ -1,6 +1,8 @@
-﻿namespace FeedService.Services.PriceFeedGenerationServices;
+﻿using FeedService.Domain.Models;
+
+namespace FeedService.Services.PriceFeedGenerationServices;
 
 public interface IPriceFeedGenerationService
 {
-    Task<List<object>> GenerateFeedWithPrices(object cultureFeed, Guid? traceId = null);
+    Task<List<object>> GenerateFeedWithPrices(List<SalesAreaConfiguration> salesAreas, Guid? traceId = null);
 }
