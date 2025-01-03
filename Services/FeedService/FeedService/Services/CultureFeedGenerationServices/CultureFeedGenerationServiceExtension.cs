@@ -32,14 +32,14 @@ namespace FeedService.Services.CultureFeedGenerationServices
         /// <param name="traceId">Unique identifier for request tracing</param>
         /// <returns>Culture-specific product representation or null if mapping fails</returns>
         /// <exception cref="ArgumentNullException">Thrown when product or culture is null</exception>
-        public static object? MapProductForCulture(NorceFeedProductDto product, CultureConfiguration culture, IOptionsMonitor<NorceBaseModuleOptions> norceOptions, IOptionsMonitor<BaseModuleOptions> baseOptions, ILogger logger, Guid? traceId = null)
+        public static List<DataFeedWatchDto>? MapProductForCulture(NorceFeedProductDto product, CultureConfiguration culture, IOptionsMonitor<NorceBaseModuleOptions> norceOptions, IOptionsMonitor<BaseModuleOptions> baseOptions, ILogger logger, Guid? traceId = null)
         {
             try
             {
                 if (product == null) throw new ArgumentNullException(nameof(product));
                 if (culture == null) throw new ArgumentNullException(nameof(culture));
 
-                var processedProducts = new List<object>();
+                var processedProducts = new List<DataFeedWatchDto>();
 
                 if (product.Variants == null || !product.Variants.Any())
                     return processedProducts;
@@ -156,7 +156,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
         /// <param name="traceId">Unique identifier for request tracing</param>
         /// <returns>True if both product and variant are valid, false otherwise</returns>
         /// <exception cref="ArgumentNullException">Thrown when required parameters are null</exception>
-        private static bool ProductAndVariantIsValid(NorceFeedProductDto product, NorceFeedVariant norceFeedVariant, string cultureCode, ILogger logger, Guid? traceId = null)
+        public static bool ProductAndVariantIsValid(NorceFeedProductDto product, NorceFeedVariant norceFeedVariant, string cultureCode, ILogger logger, Guid? traceId = null)
         {
             try
             {
@@ -232,7 +232,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
         /// <summary>
         /// Gets the culture-specific value from a parametric.
         /// </summary>
-        private static string? GetCultureSpecificParametricValue(Parametric? parametric, string cultureCode)
+        public static string? GetCultureSpecificParametricValue(Parametric? parametric, string cultureCode)
         {
             if (parametric == null) return null;
 
@@ -247,7 +247,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
         /// <summary>
         /// Constructs the product link based on URL and unique url name.
         /// </summary>
-        private static string GetProductLink(string url, string? uniqueUrlName)
+        public static string GetProductLink(string url, string? uniqueUrlName)
         {
             if (string.IsNullOrWhiteSpace(uniqueUrlName) || string.IsNullOrEmpty(url)) return string.Empty;
             return url.Replace("uniqueUrlName", uniqueUrlName);
@@ -256,7 +256,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
         /// <summary>
         /// Extracts additional images from variant files.
         /// </summary>
-        private static List<string> ExtractAdditionalImages(List<Domain.Norce.File>? files)
+        public static List<string> ExtractAdditionalImages(List<Domain.Norce.File>? files)
         {
             return files?
                 .Where(f => f.Type == "asset" && !string.IsNullOrEmpty(f.Url))
@@ -267,7 +267,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
         /// <summary>
         /// Extracts flags with culture-specific values.
         /// </summary>
-        private static Dictionary<string, string> ExtractFlags(List<Flag> flags, string cultureCode)
+        public static Dictionary<string, string> ExtractFlags(List<Flag> flags, string cultureCode)
         {
             var flagsDictionary = new Dictionary<string, string>();
             foreach (var flag in flags)
@@ -288,10 +288,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
         /// <summary>
         /// Extracts parametrics with culture-specific values.
         /// </summary>
-        private static Dictionary<string, string> ExtractParametrics(
-            NorceFeedProductDto product,
-            NorceFeedVariant variant,
-            string cultureCode)
+        public static Dictionary<string, string> ExtractParametrics(NorceFeedProductDto product, NorceFeedVariant variant, string cultureCode)
         {
             var parametrics = new Dictionary<string, string>();
 

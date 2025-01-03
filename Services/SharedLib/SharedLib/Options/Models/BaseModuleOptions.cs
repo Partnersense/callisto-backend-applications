@@ -74,5 +74,5 @@ public class BaseModuleOptions
     /// <summary>
     /// List of sales area IDs to include in processing
     /// </summary>
-    public Dictionary<string, string> CultureProductUrlList { get; private set; } = [];
+    public Dictionary<string, string> CultureProductUrlList { get; set; } = [];
 }
