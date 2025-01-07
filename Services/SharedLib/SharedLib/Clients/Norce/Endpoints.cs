@@ -35,6 +35,9 @@ public static class Endpoints
 
             public static string ListFlags(string? cultureCode = "") =>
                 $"{Base}ListFlags?format=json&cultureCode={cultureCode}";
+
+            public static string ListProducts2(List<int> statusSeed, List<int> pricelistSeed, int SalesAreaId) =>
+                $"{Base}ListProducts2?statusSeed={string.Join(",", statusSeed)}&pricelistSeed={string.Join(",", pricelistSeed)}&salesAreaId={SalesAreaId}";
         }
         public static class Shopping
         {

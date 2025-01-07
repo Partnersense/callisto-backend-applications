@@ -42,6 +42,8 @@ public class NorceApiClient(INorceClient client)
         return product;
     }
 
+
+
     /// <summary>
     /// Retrieves a list of flags from the Norce API, optionally filtered by a specific culture code.
     /// </summary>
@@ -61,5 +63,36 @@ public class NorceApiClient(INorceClient client)
         var flags = JsonSerializer.Deserialize<List<NorceApiFlag>>(json);
 
         return flags;
+    }
+
+    /// <summary>
+    /// Retrieves a list of products from the Norce API based on specified status codes, price list identifiers, and sales area.
+    /// This method fetches product data that matches all the provided filtering criteria.
+    /// </summary>
+    /// <param name="statusSeed">List of status codes to filter products. Each status code represents a different product state in the system.</param>
+    /// <param name="priceListSeed">List of price list identifiers to filter products. Products must be associated with at least one of these price lists.</param>
+    /// <param name="SalesAreaId">The unique identifier of the sales area to retrieve products from.</param>
+    /// <param name="traceId">Optional unique identifier for request tracing.</param>
+    /// <returns>
+    /// A list of <see cref="ListProducts2Response"/> objects containing the product information if the request is successful,
+    /// or null if no products are found or if there's an error in the request.
+    /// </returns>
+    /// <exception cref="JsonException">Thrown when the response cannot be deserialized into the expected format.</exception>
+    /// <exception cref="HttpRequestException">Thrown when there's an error in the HTTP request to the Norce API.</exception>
+    /// <remarks>
+    /// The method uses the BaseGetAsync method to make the API call and deserializes the JSON response into a strongly-typed list.
+    /// If the API call returns an empty or whitespace response, the method logs a warning and returns null.
+    /// </remarks>
+    public async Task<List<ListProducts2Response>?> GetProducts(List<int> statusSeed, List<int> priceListSeed, int SalesAreaId)
+    {
+        var json = await client.BaseGetAsync(Endpoints.Api.Product.ListProducts2(statusSeed, priceListSeed, SalesAreaId));
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            Log.Logger.Warning("Could not fetch products with statusSeed: {statusSeed}, PriceListSeed: {priceListSeed}, SalesAreaId: {salesAreaId}", string.Join(",", statusSeed), string.Join(",", priceListSeed, SalesAreaId));
+            return null;
+        }
+
+        var product = JsonSerializer.Deserialize<List<ListProducts2Response>>(json);
+        return product;
     }
 }

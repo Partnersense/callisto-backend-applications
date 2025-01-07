@@ -49,13 +49,6 @@ public class FeedBuilder(
 
     public override async Task Execute(CancellationToken cancellationToken)
     {
-
-        // I want the feed builder class to only include a execute method that calls other classes, i do not want logic in this class, its not as neat and easely tested.
-        // I want each separate logic to be in its own class so that it is easier to maintain, and switch out to a newer class in the future with the same interface, error tracing and so forth.
-
-        // I have implemented more extensive logs in the services I have created, see examples in CultureConfigurationServiceExtension the logs are long yes, but they are in a 
-        // in a format to make it easier to filter and make dashboards in elastic later on, make sure to use traceId in all methods to make it easier to filter out logs for
-        // differet runs, this to make error searching in prod a lot easier, see examples of error handling and error logs in the CultureConfigurationServiceExtension aswelll
         var traceId = Guid.NewGuid();
 
         await configurationRefresher.TryRefreshAsync(cancellationToken);
@@ -67,6 +60,7 @@ public class FeedBuilder(
         var cultures = await cultureConfigurationSerivce.GetCultureConfigurations(traceId);
         var salesAreas = await salesAreaConfigurationService.GetSalesAreaConfigurations(traceId);
 
+        // Get prices and sales areas 
         var feedWithPrice = await priceFeedGenerationService.GenerateFeedWithPrices(salesAreas, traceId);
         var feedWithCulturesNotPrice = await cultureFeedGenerationService.GenerateFeedWithCultures(cultures, traceId);
 
