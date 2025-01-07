@@ -66,10 +66,10 @@ public class FeedBuilder(
         // Get cultures and sales areas with filters. Filters are found in the config in azure
         var cultures = await cultureConfigurationSerivce.GetCultureConfigurations(traceId);
         var salesAreas = await salesAreaConfigurationService.GetSalesAreaConfigurations(traceId);
+
+        var feedWithPrice = await priceFeedGenerationService.GenerateFeedWithPrices(salesAreas, traceId);
         var feedWithCulturesNotPrice = await cultureFeedGenerationService.GenerateFeedWithCultures(cultures, traceId);
 
-        // TODO: Add PriceLogic to the cuture feed (the best way to do it is the question), all product price logic needs to be fetched per sales area to get best price per sales area (pricelist seeds are in saleare object and is enriched in the GetSalesAreaConfigurations method)
-        var feedWithPrice = await priceFeedGenerationService.GenerateFeedWithPrices(salesAreas, traceId);
 
         // TODO: Upload to Azure Storage method, create this service prefeibly in the lib as this could be done very generlized
 
