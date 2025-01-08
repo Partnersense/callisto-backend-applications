@@ -110,18 +110,6 @@ namespace FeedService.Services.CultureFeedGenerationServices
                     processedProducts.Add(item);
                 }
 
-                logger.LogInformation(
-                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters ProductCode: {productCode}, CultureCode: {cultureCode}, VariantCount: {variantCount}",
-                    traceId,
-                    nameof(CultureFeedGenerationServiceExtension),
-                    nameof(LoggingTypes.CheckpointLog),
-                    nameof(MapProductForCulture),
-                    "Successfully mapped product variants for culture",
-                    product.Code,
-                    cultureCode,
-                    processedProducts.Count
-                );
-
                 return processedProducts;
             }
             catch (Exception ex)

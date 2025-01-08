@@ -43,8 +43,6 @@ namespace FeedService.Services.CultureFeedGenerationServices
                     nameof(MethodActionLogTypes.Starting)
                 );
 
-                var processedProducts = new List<DataFeedWatchDto>();
-
                 // Fetch all products from Norce
                 await foreach (var product in norceClient.ProductFeed.StreamProductFeedAsync(norceProductFeedOptions.CurrentValue.ChannelKey, null, cancellationToken))
                 {
@@ -53,17 +51,6 @@ namespace FeedService.Services.CultureFeedGenerationServices
                         // Process each product for each culture
                         foreach (var culture in cultures)
                         {
-                            logger.LogInformation(
-                                "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters ProductCode: {productCode}, Culture: {culture}",
-                                traceId,
-                                nameof(CultureFeedGenerationService),
-                                nameof(LoggingTypes.CheckpointLog),
-                                nameof(GenerateFeedWithCultures),
-                                "Processing product for culture",
-                                product.Code,
-                                culture.CultureCode
-                            ); //todo take away
-
                             var processedProduct = CultureFeedGenerationServiceExtension.MapProductForCulture(
                                 product,
                                 culture,
@@ -80,15 +67,29 @@ namespace FeedService.Services.CultureFeedGenerationServices
                     }
                 }
 
+
+                foreach (var culture in cultures)
+                {
+                    logger.LogInformation(
+                        "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters Culture: {culture}, Products: {products}",
+                        traceId,
+                        nameof(CultureFeedGenerationService),
+                        nameof(LoggingTypes.InformationLog),
+                        nameof(GenerateFeedWithCultures),
+                        "Product generation for cultures done",
+                        culture,
+                        culture.Products.Count
+                        );
+                }
+
                 logger.LogInformation(
-                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters Action: {action}, ProductCount: {count}",
+                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters Action: {action}",
                     traceId,
                     nameof(CultureFeedGenerationService),
                     nameof(LoggingTypes.CheckpointLog),
                     nameof(GenerateFeedWithCultures),
                     "Completed feed generation with cultures",
-                    nameof(MethodActionLogTypes.Completed),
-                    processedProducts.Count
+                    nameof(MethodActionLogTypes.Completed)
                 );
 
                 return cultures;
