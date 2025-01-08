@@ -36,7 +36,7 @@ namespace SharedLib.Models.Norce.Query
         /// </summary>
         [StringLength(16)]
         [Required]
-        [JsonPropertyName("cultureCode")]
+        [JsonPropertyName("CultureCode")]
         public string CultureCode { get; init; } = string.Empty;
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace SharedLib.Models.Norce.Query
         /// "1006"
         /// </summary>
         [Required]
-        [JsonPropertyName("clientId")]
+        [JsonPropertyName("ClientId")]
         public int ClientId { get; init; }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SharedLib.Models.Norce.Query
         /// "false"
         /// </summary>
         [Required]
-        [JsonPropertyName("isPrimary")]
+        [JsonPropertyName("IsPrimary")]
         public bool IsPrimary { get; init; }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace SharedLib.Models.Norce.Query
         /// "2024-10-17T08:12:10.477Z"
         /// </summary>
         [Required]
-        [JsonPropertyName("created")]
+        [JsonPropertyName("Created")]
         public DateTime Created { get; init; }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace SharedLib.Models.Norce.Query
         /// "1195"
         /// </summary>
         [Required]
-        [JsonPropertyName("createdBy")]
+        [JsonPropertyName("CreatedBy")]
         public int CreatedBy { get; init; }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace SharedLib.Models.Norce.Query
         /// "null"
         /// "2024-10-17T08:12:10.477Z"
         /// </summary>
-        [JsonPropertyName("updated")]
+        [JsonPropertyName("Updated")]
         public DateTime? Updated { get; init; }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace SharedLib.Models.Norce.Query
         /// "null"
         /// "1195"
         /// </summary>
-        [JsonPropertyName("updatedBy")]
+        [JsonPropertyName("UpdatedBy")]
         public int? UpdatedBy { get; init; }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace SharedLib.Models.Norce.Query
         /// Example Values:
         /// </summary>
         [StringLength(128)]
-        [JsonPropertyName("collation")]
+        [JsonPropertyName("Collation")]
         public string? Collation { get; init; }
     }
 }

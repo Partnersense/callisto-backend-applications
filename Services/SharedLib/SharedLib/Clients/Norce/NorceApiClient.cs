@@ -1,11 +1,20 @@
 ﻿using System.Text.Json;
+using Elastic.CommonSchema;
 using SharedLib.Models.Norce.Api;
+using SharedLib.Serialization;
 using Log = Serilog.Log;
 
 namespace SharedLib.Clients.Norce;
 
 public class NorceApiClient(INorceClient client)
 {
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new NorceDateTimeConverter() }
+    };
+
+
     public async Task<string> GetAsync(string query, string? applicationId = null)
     {
         return await client.BaseGetAsync(query, applicationId);
@@ -85,14 +94,31 @@ public class NorceApiClient(INorceClient client)
     /// </remarks>
     public async Task<List<ListProducts2Response>?> GetProducts(List<int> statusSeed, List<int> priceListSeed, int SalesAreaId)
     {
-        var json = await client.BaseGetAsync(Endpoints.Api.Product.ListProducts2(statusSeed, priceListSeed, SalesAreaId));
-        if (string.IsNullOrWhiteSpace(json))
+        var page = 1;
+        var pageSize = 500;
+        var products = new List<ListProducts2Response>();
+
+        while (true)
         {
-            Log.Logger.Warning("Could not fetch products with statusSeed: {statusSeed}, PriceListSeed: {priceListSeed}, SalesAreaId: {salesAreaId}", string.Join(",", statusSeed), string.Join(",", priceListSeed, SalesAreaId));
-            return null;
+            var json = await client.BaseGetAsync(Endpoints.Api.Product.ListProducts2(statusSeed, priceListSeed, SalesAreaId, page, pageSize));
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                Log.Logger.Warning("Could not fetch products with statusSeed: {statusSeed}, PriceListSeed: {priceListSeed}, SalesAreaId: {salesAreaId}", string.Join(",", statusSeed), string.Join(",", priceListSeed, SalesAreaId));
+                return null;
+            }
+
+            var serializedList = JsonSerializer.Deserialize<ApiItemWrapperResponse<ListProducts2Response>>(json, _jsonOptions);
+
+            if (serializedList?.Items == null)
+                return null;
+
+            if(serializedList.Items.Count == 0)
+                break;
+
+            products.AddRange(serializedList.Items);
+            page++;
         }
 
-        var product = JsonSerializer.Deserialize<List<ListProducts2Response>>(json);
-        return product;
+        return products;
     }
 }

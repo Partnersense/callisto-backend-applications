@@ -33,7 +33,6 @@ namespace SharedLib.Models.Norce.Query
         /// "1"
         /// </summary>
         [Required]
-        [JsonPropertyName("salesAreaId")]
         public int SalesAreaId { get; init; }
 
         /// <summary>
@@ -43,7 +42,6 @@ namespace SharedLib.Models.Norce.Query
         /// "1006"
         /// </summary>
         [Required]
-        [JsonPropertyName("clientId")]
         public int ClientId { get; init; }
 
         /// <summary>
@@ -53,7 +51,6 @@ namespace SharedLib.Models.Norce.Query
         /// "true"
         /// </summary>
         [Required]
-        [JsonPropertyName("isPrimary")]
         public bool IsPrimary { get; init; }
 
         /// <summary>
@@ -63,7 +60,6 @@ namespace SharedLib.Models.Norce.Query
         /// "2024-02-20T15:30:01.477Z"
         /// </summary>
         [Required]
-        [JsonPropertyName("created")]
         public DateTime Created { get; init; }
 
         /// <summary>
@@ -73,7 +69,6 @@ namespace SharedLib.Models.Norce.Query
         /// "9"
         /// </summary>
         [Required]
-        [JsonPropertyName("createdBy")]
         public int CreatedBy { get; init; }
 
         /// <summary>
@@ -83,7 +78,6 @@ namespace SharedLib.Models.Norce.Query
         /// "null"
         /// "2024-08-20T11:21:16.15Z"
         /// </summary>
-        [JsonPropertyName("updated")]
         public DateTime? Updated { get; init; }
 
         /// <summary>
@@ -93,7 +87,6 @@ namespace SharedLib.Models.Norce.Query
         /// "null"
         /// "1035"
         /// </summary>
-        [JsonPropertyName("updatedBy")]
         public int? UpdatedBy { get; init; }
 
         /// <summary>
@@ -103,7 +96,6 @@ namespace SharedLib.Models.Norce.Query
         /// "SE"
         /// </summary>
         [StringLength(50)]
-        [JsonPropertyName("code")]
         public string? Code { get; init; }
     }
 }

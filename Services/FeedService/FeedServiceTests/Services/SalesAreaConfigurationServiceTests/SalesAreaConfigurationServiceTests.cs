@@ -51,37 +51,51 @@ public class SalesAreaConfigurationServiceTests
     {
         // Arrange
         var traceId = Guid.NewGuid();
-        var salesAreas = new List<SalesAreaResponse>
+       
+
+        var salesAreas = new OdataWrapperResponse<SalesAreaResponse>
         {
-            new()
+            Context = "odata",
+            Value = new List<SalesAreaResponse>
             {
-                SalesAreaId = 1,
-                ClientId = 1006,
-                IsPrimary = true,
-                Created = DateTime.UtcNow,
-                CreatedBy = 1,
-                Code = "SE"
+                new()
+                {
+                    SalesAreaId = 1,
+                    ClientId = 1006,
+                    IsPrimary = true,
+                    Created = DateTime.UtcNow,
+                    CreatedBy = 1,
+                    Code = "SE"
+                }
             }
         };
 
-        var priceLists = new List<PriceListClientResponse>
+        var priceLists = new OdataWrapperResponse<PriceListClientResponse>
         {
-            new()
+            Context = "odata",
+            Value = new List<PriceListClientResponse>
             {
-                PriceListId = 1,
-                SalesAreaId = 1,
-                CurrencyId = 1,
-                PriceList = new PriceListResponse { IsActive = true }
+                new()
+                {
+                    PriceListId = 1,
+                    SalesAreaId = 1,
+                    CurrencyId = 1,
+                    IsActive = true,
+                    PriceList = new PriceListResponse { IsActive = true }
+                }
             }
         };
-
-        var currencies = new List<CurrenciesResponse>
+        var currencies = new OdataWrapperResponse<CurrenciesResponse>
         {
-            new()
+            Context = "odata",
+            Value = new List<CurrenciesResponse>
             {
-                Id = 1,
-                Code = "SEK",
-                IsActive = true
+                new()
+                {
+                    Id = 1,
+                    Code = "SEK",
+                    IsActive = true
+                }
             }
         };
 
@@ -92,7 +106,7 @@ public class SalesAreaConfigurationServiceTests
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientSalesAreas, It.IsAny<string>()))
             .ReturnsAsync(salesAreasJson);
 
-        _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientPriceLists, It.IsAny<string>()))
+        _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientPriceListsIncPriceList, It.IsAny<string>()))
             .ReturnsAsync(priceListsJson);
 
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Core.Currencies, It.IsAny<string>()))
@@ -144,7 +158,17 @@ public class SalesAreaConfigurationServiceTests
     {
         // Arrange
         var traceId = Guid.NewGuid();
-        var salesAreas = new List<SalesAreaResponse> { new() { SalesAreaId = 1 } };
+        
+
+        var salesAreas = new OdataWrapperResponse<SalesAreaResponse>
+        {
+            Context = "odata",
+            Value = new List<SalesAreaResponse>
+            {
+                new() { SalesAreaId = 1, Code = "SE" },
+            }
+        };
+
 
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientSalesAreas, It.IsAny<string>()))
             .ReturnsAsync(JsonSerializer.Serialize(salesAreas));
@@ -162,7 +186,16 @@ public class SalesAreaConfigurationServiceTests
     {
         // Arrange
         var traceId = Guid.NewGuid();
-        var salesAreas = new List<SalesAreaResponse> { new() { SalesAreaId = 1 } };
+
+        var salesAreas = new OdataWrapperResponse<SalesAreaResponse>
+        {
+            Context = "odata",
+            Value = new List<SalesAreaResponse>
+            {
+                new() { SalesAreaId = 1, Code = "SE" }
+            }
+        };
+
 
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientSalesAreas, It.IsAny<string>()))
             .ReturnsAsync(JsonSerializer.Serialize(salesAreas));
@@ -180,8 +213,28 @@ public class SalesAreaConfigurationServiceTests
     {
         // Arrange
         var traceId = Guid.NewGuid();
-        var salesAreas = new List<SalesAreaResponse> { new() { SalesAreaId = 1 } };
-        var priceLists = new List<PriceListClientResponse> { new() { PriceListId = 1 } };
+        
+
+        var salesAreas = new OdataWrapperResponse<SalesAreaResponse>
+        {
+            Context = "odata",
+            Value = new List<SalesAreaResponse>
+            {
+                new() { SalesAreaId = 1, Code = "SE" },
+                new() { SalesAreaId = 2, Code = "US" }
+            }
+        };
+
+        var priceLists = new OdataWrapperResponse<PriceListClientResponse>
+        {
+            Context = "odata",
+            Value = new List<PriceListClientResponse>
+            {
+                new() { PriceListId = 1, SalesAreaId = 1, CurrencyId = 1, IsActive = true, PriceList = new PriceListResponse { IsActive = true } },
+                new() { PriceListId = 2, SalesAreaId = 2, CurrencyId = 1, IsActive = true, PriceList = new PriceListResponse { IsActive = true } }
+            }
+        };
+       
 
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientSalesAreas, It.IsAny<string>()))
             .ReturnsAsync(JsonSerializer.Serialize(salesAreas));
@@ -202,8 +255,8 @@ public class SalesAreaConfigurationServiceTests
     {
         // Arrange
         var traceId = Guid.NewGuid();
-        var salesAreas = new List<SalesAreaResponse> { new() { SalesAreaId = 1 } };
-        var priceLists = new List<PriceListClientResponse> { new() { PriceListId = 1 } };
+        var salesAreas = new OdataWrapperResponse<SalesAreaResponse>{Context = "odata", Value = new List<SalesAreaResponse>{new SalesAreaResponse{ SalesAreaId = 1 } } };
+        var priceLists = new OdataWrapperResponse<PriceListClientResponse> {Context = "odata", Value = new List<PriceListClientResponse> {new PriceListClientResponse { PriceListId = 1 } } };
 
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientSalesAreas, It.IsAny<string>()))
             .ReturnsAsync(JsonSerializer.Serialize(salesAreas));
@@ -248,20 +301,29 @@ public class SalesAreaConfigurationServiceTests
     {
         // Arrange
         var traceId = Guid.NewGuid();
-        var salesAreas = new List<SalesAreaResponse>
+
+        var salesAreas = new OdataWrapperResponse<SalesAreaResponse>
+        {
+            Context = "odata",
+            Value = new List<SalesAreaResponse>
             {
                 new() { SalesAreaId = 1, ClientId = 1006, IsPrimary = true, Created = DateTime.UtcNow, CreatedBy = 1, Code = "SE" },
                 new() { SalesAreaId = 2, ClientId = 1006, IsPrimary = false, Created = DateTime.UtcNow, CreatedBy = 1, Code = "US" },
                 new() { SalesAreaId = 3, ClientId = 1006, IsPrimary = false, Created = DateTime.UtcNow, CreatedBy = 1, Code = "NO" }
-            };
+            }
+        };
 
-        var priceLists = new List<PriceListClientResponse>
+        var priceLists = new OdataWrapperResponse<PriceListClientResponse>
+        {
+            Context = "odata",
+            Value = new List<PriceListClientResponse>
             {
                 new()
                 {
                     PriceListId = 1,
                     SalesAreaId = 1,
                     CurrencyId = 1,
+                    IsActive = true,
                     PriceList = new PriceListResponse { IsActive = true }
                 },
                 new()
@@ -269,6 +331,7 @@ public class SalesAreaConfigurationServiceTests
                     PriceListId = 2,
                     SalesAreaId = 2,
                     CurrencyId = 1,
+                    IsActive = true,
                     PriceList = new PriceListResponse { IsActive = true }
                 },
                 new()
@@ -276,11 +339,15 @@ public class SalesAreaConfigurationServiceTests
                     PriceListId = 3,
                     SalesAreaId = 3,
                     CurrencyId = 1,
+                    IsActive = true,
                     PriceList = new PriceListResponse { IsActive = true }
                 }
-            };
-
-        var currencies = new List<CurrenciesResponse>
+            }
+        };
+        var currencies = new OdataWrapperResponse<CurrenciesResponse>
+        {
+            Context = "odata",
+            Value = new List<CurrenciesResponse>
             {
                 new()
                 {
@@ -288,7 +355,10 @@ public class SalesAreaConfigurationServiceTests
                     Code = "SEK",
                     IsActive = true
                 }
-            };
+            }
+        };
+
+
 
         var salesAreasJson = JsonSerializer.Serialize(salesAreas);
         var priceListsJson = JsonSerializer.Serialize(priceLists);
@@ -296,7 +366,7 @@ public class SalesAreaConfigurationServiceTests
 
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientSalesAreas, It.IsAny<string>()))
             .ReturnsAsync(salesAreasJson);
-        _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientPriceLists, It.IsAny<string>()))
+        _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientPriceListsIncPriceList, It.IsAny<string>()))
             .ReturnsAsync(priceListsJson);
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Core.Currencies, It.IsAny<string>()))
             .ReturnsAsync(currenciesJson);
@@ -319,22 +389,28 @@ public class SalesAreaConfigurationServiceTests
         var traceId = Guid.NewGuid();
         _baseOptions.IncludedSalesAreaIds = ""; // Empty filter list
 
-        var salesAreas = new List<SalesAreaResponse>
+        var salesAreas = new OdataWrapperResponse<SalesAreaResponse> { Context = "odata", Value = new List<SalesAreaResponse>
             {
                 new() { SalesAreaId = 1, Code = "SE" },
                 new() { SalesAreaId = 2, Code = "US" }
-            };
+            }
+        };
 
-        var priceLists = new List<PriceListClientResponse>
+        var priceLists = new OdataWrapperResponse<PriceListClientResponse> { Context = "odata", Value = new List<PriceListClientResponse>
             {
-                new() { PriceListId = 1, SalesAreaId = 1, CurrencyId = 1, PriceList = new PriceListResponse { IsActive = true } },
-                new() { PriceListId = 2, SalesAreaId = 2, CurrencyId = 1, PriceList = new PriceListResponse { IsActive = true } }
-            };
-
-        var currencies = new List<CurrenciesResponse>
+                new() { PriceListId = 1, SalesAreaId = 1, CurrencyId = 1, IsActive = true, PriceList = new PriceListResponse { IsActive = true } },
+                new() { PriceListId = 2, SalesAreaId = 2, CurrencyId = 1, IsActive = true, PriceList = new PriceListResponse { IsActive = true } }
+            }
+        };
+        var currencies = new OdataWrapperResponse<CurrenciesResponse>
+        {
+            Context = "odata",
+            Value = new List<CurrenciesResponse>
             {
                 new() { Id = 1, Code = "SEK", IsActive = true }
-            };
+            }
+        };
+
 
         SetupMockResponses(salesAreas, priceLists, currencies);
 
@@ -343,19 +419,21 @@ public class SalesAreaConfigurationServiceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(salesAreas.Count, result.Count);
+        Assert.Equal(salesAreas.Value.Count, result.Count);
     }
 
 
     private void SetupMockResponses(
-        List<SalesAreaResponse> salesAreas,
-        List<PriceListClientResponse> priceLists,
-        List<CurrenciesResponse> currencies)
+        OdataWrapperResponse<SalesAreaResponse> salesAreas,
+        OdataWrapperResponse<PriceListClientResponse> priceLists,
+        OdataWrapperResponse<CurrenciesResponse> currencies)
     {
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientSalesAreas, It.IsAny<string>()))
             .ReturnsAsync(JsonSerializer.Serialize(salesAreas));
-        _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientPriceLists, It.IsAny<string>()))
+
+        _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientPriceListsIncPriceList, It.IsAny<string>()))
             .ReturnsAsync(JsonSerializer.Serialize(priceLists));
+
         _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Core.Currencies, It.IsAny<string>()))
             .ReturnsAsync(JsonSerializer.Serialize(currencies));
     }

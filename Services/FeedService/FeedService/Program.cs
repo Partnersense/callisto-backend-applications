@@ -12,6 +12,8 @@ using FeedService.Services.SalesAreaConfigurationServices;
 using FeedService.Services.CultureConfigurationServices;
 using FeedService.Services.CultureFeedGenerationServices;
 using FeedService.Services.PriceFeedGenerationServices;
+using FeedService.Services.StorageServices;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +79,7 @@ builder.Services.AddTransient<ICultureConfigurationService, CultureConfiguration
 builder.Services.AddTransient<ISalesAreaConfigurationService, SalesAreaConfigurationService>();
 builder.Services.AddTransient<ICultureFeedGenerationService, CultureFeedGenerationService>();
 builder.Services.AddTransient<IPriceFeedGenerationService, PriceFeedGenerationService>();
+builder.Services.AddTransient<IStorageUploadService, AzureStorageService>();
 builder.Services.AddTransient<IJob, FeedBuilder>();
 builder.Services.AddHostedService<Worker>();
 

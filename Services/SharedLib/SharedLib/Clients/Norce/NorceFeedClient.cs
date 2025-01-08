@@ -22,11 +22,11 @@ public class NorceFeedClient(INorceClient client, ILogger<NorceClient> logger) :
 
         while (await file.ReadLineAsync(cancellationToken) is { } line)
         {
-            NorceFeedProductDto? product = null;
+            List<NorceFeedProductDto>? products;
             try
             {
-                product = JsonSerializer.Deserialize<NorceFeedProductDto>(line);
-                if (product is null)
+                products = JsonSerializer.Deserialize<List<NorceFeedProductDto>>(line);
+                if (products is null)
                 {
                     Log.Logger.Warning("Could not map product properly. {@Line}", line);
                     continue;
@@ -38,7 +38,7 @@ public class NorceFeedClient(INorceClient client, ILogger<NorceClient> logger) :
                 continue;
             }
 
-            yield return product;
+            foreach (var norceFeedProductDto in products) yield return norceFeedProductDto;
         }
     }
 

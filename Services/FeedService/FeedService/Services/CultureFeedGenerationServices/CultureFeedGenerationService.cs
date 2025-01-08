@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using SharedLib.Clients.Norce;
 using SharedLib.Logging.Enums;
 using SharedLib.Options.Models;
+using System.Threading;
 
 namespace FeedService.Services.CultureFeedGenerationServices
 {
@@ -28,7 +29,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
         /// <returns>A list of processed products with culture-specific attributes</returns>
         /// <exception cref="ArgumentNullException">Thrown when cultures parameter is null</exception>
         /// <exception cref="InvalidOperationException">Thrown when unable to process the feed</exception>
-        public async Task<List<CultureConfiguration>> GenerateFeedWithCultures(List<CultureConfiguration> cultures, Guid? traceId = null)
+        public async Task<List<CultureConfiguration>> GenerateFeedWithCultures(List<CultureConfiguration> cultures, CancellationToken cancellationToken, Guid? traceId = null)
         {
             try
             {
@@ -45,7 +46,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
                 var processedProducts = new List<DataFeedWatchDto>();
 
                 // Fetch all products from Norce
-                await foreach (var product in norceClient.ProductFeed.StreamProductFeedAsync(norceProductFeedOptions.CurrentValue.ChannelKey, cancellationToken: default))
+                await foreach (var product in norceClient.ProductFeed.StreamProductFeedAsync(norceProductFeedOptions.CurrentValue.ChannelKey, null, cancellationToken))
                 {
                     if (product != null)
                     {
@@ -61,7 +62,7 @@ namespace FeedService.Services.CultureFeedGenerationServices
                                 "Processing product for culture",
                                 product.Code,
                                 culture.CultureCode
-                            );
+                            ); //todo take away
 
                             var processedProduct = CultureFeedGenerationServiceExtension.MapProductForCulture(
                                 product,

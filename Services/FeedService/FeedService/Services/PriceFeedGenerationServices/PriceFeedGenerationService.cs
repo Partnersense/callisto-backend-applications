@@ -62,14 +62,16 @@ namespace FeedService.Services.PriceFeedGenerationServices
                         salesArea.ProductsPriceInfo = PriceFeedGenerationServiceExtension.MapListProductsToPriceProducts(products, _logger, traceId);
 
                         _logger.LogInformation(
-                            "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters SalesAreaId: {salesAreaId}, ProductCount: {productCount}",
+                            "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters SalesAreaId: {salesAreaId}, ProductCount: {productCount}, ValidProducts: {validProducts}, InvalidProducts: {invalidProducts}",
                             traceId,
                             nameof(PriceFeedGenerationService),
                             nameof(LoggingTypes.CheckpointLog),
                             nameof(GenerateFeedWithPrices),
                             "Successfully processed price data for sales area",
                             salesArea.SalesAreaId,
-                            salesArea.ProductsPriceInfo.Count
+                            products.Count,
+                            salesArea.ProductsPriceInfo.Count,
+                            products.Count- salesArea.ProductsPriceInfo.Count
                         );
                     }
                     catch (Exception ex)

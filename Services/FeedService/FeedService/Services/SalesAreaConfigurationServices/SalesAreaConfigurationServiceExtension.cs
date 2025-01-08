@@ -27,7 +27,7 @@ namespace FeedService.Services.SalesAreaConfigurationServices
             {
                 // Get pricelists for this sales area
                 var salesAreaPriceLists = allPriceLists
-                    .Where(pl => pl.PriceList.IsActive && pl.SalesAreaId == salesArea.SalesAreaId)
+                    .Where(pl => pl.IsActive && (pl.SalesAreaId == salesArea.SalesAreaId || salesArea.IsPrimary && pl.SalesAreaId == null))
                     .ToList();
 
                 if (salesAreaPriceLists == null || !salesAreaPriceLists.Any())
@@ -124,14 +124,15 @@ namespace FeedService.Services.SalesAreaConfigurationServices
                     .ToList();
 
                 _logger.LogInformation(
-                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters TotalSalesAreas: {totalSalesAreas}, FilteredSalesAreas: {filteredSalesAreas}",
+                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters TotalSalesAreas: {totalSalesAreas}, FilteredSalesAreas: {filteredSalesAreas}, FilteredSalesAreasCodes: {filteredSalesAreasCodes}",
                     traceId,
                     nameof(SalesAreaConfigurationServiceExtension),
                     nameof(LoggingTypes.CheckpointLog),
                     nameof(FilterSalesAreasByIncludedIds),
                     "Successfully filtered sales areas",
                     salesAreas.Count,
-                    filteredSalesAreas.Count
+                    filteredSalesAreas.Count,
+                    string.Join(',',filteredSalesAreas.Select(x => x.Code))
                 );
 
                 return filteredSalesAreas;

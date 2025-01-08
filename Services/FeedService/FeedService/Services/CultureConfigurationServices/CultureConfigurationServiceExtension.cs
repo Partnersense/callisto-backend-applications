@@ -108,14 +108,15 @@ namespace FeedService.Services.CultureConfigurationServices
                     .ToList();
 
                 _logger.LogInformation(
-                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters TotalCultures: {totalCultures}, FilteredCultures: {filteredCultures}",
+                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters TotalCultures: {totalCultures}, FilteredCultures: {filteredCultures}, FilteredCulturesCodes: {filteredCulturesCodes}",
                     traceId,
                     nameof(CultureConfigurationServiceExtension),
                     nameof(LoggingTypes.CheckpointLog),
                     nameof(FilterCulturesByIncludedCodes),
                     "Successfully filtered cultures",
                     cultures.Count,
-                    filteredCultures.Count
+                    filteredCultures.Count,
+                    string.Join(',', filteredCultures.Select(x => x.CultureCode))
                 );
 
                 return filteredCultures;

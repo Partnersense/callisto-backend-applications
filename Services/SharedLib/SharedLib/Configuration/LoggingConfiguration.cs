@@ -28,7 +28,6 @@ public static class LoggingConfiguration
 
         // Add console logging
         var loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Debug()
             .WriteTo.Console();
 
         if (elasticLoggingOptions.RunElasticLocally)

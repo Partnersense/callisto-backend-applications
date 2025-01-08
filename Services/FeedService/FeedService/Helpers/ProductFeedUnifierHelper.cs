@@ -1,46 +1,10 @@
 ﻿using FeedService.Domain.Models;
 using SharedLib.Logging.Enums;
 
-namespace FeedService.Jobs
+namespace FeedService.Helpers
 {
-    public static class FeedBuilderExtension
+    public static class ProductFeedUnifierHelper
     {
-
-        /// <summary>
-        /// Merges all the feed products into a single product, and postfixes the properties with a language code. <br/>
-        /// e.g. property "Title" is replaced by "Title_SE" for the swedish title, "Title_DK" for the danish title and so forth.
-        /// </summary>
-        /// <param name="marketFeeds"></param>
-        /// <returns>A List of dictionaries, where each dictionary represents a product.</returns>
-        public static List<Dictionary<string, object>> CombineMarketProductsOld(List<SalesAreaConfiguration> salesAreaConfigurations, List<CultureConfiguration> cultureConfigurations, ILogger logger, Guid? traceId = null)
-        {
-            // Group products by Id across all markets
-            var combinedProducts = marketFeeds
-                .SelectMany(marketFeed => marketFeed.Products.Select(product => new { product, marketFeed.Market }))
-                .GroupBy(p => p.product.Id)
-                .Select(group =>
-                {
-                    var dictionary = new Dictionary<string, object>();
-                    foreach (var marketProduct in group)
-                    {
-                        // Reflect over the properties of GenericFeedProductDto and combine them with a market postfix
-                        var market = marketProduct.Market;
-                        var product = marketProduct.product;
-
-                        var properties = product.GetType().GetProperties();
-                        foreach (var property in properties)
-                        {
-                            var value = property.GetValue(product);
-                            var propertyNameWithMarket = property.Name + "_" + market;
-                            dictionary[propertyNameWithMarket] = value;
-                        }
-                    }
-
-                    return dictionary;
-                }).ToList();
-
-            return combinedProducts;
-        }
 
         /// <summary>
         /// Combines products from different cultures and sales areas into unified products with market-specific properties.
@@ -59,11 +23,12 @@ namespace FeedService.Jobs
             {
                 if (salesAreaConfigurations == null) throw new ArgumentNullException(nameof(salesAreaConfigurations));
                 if (cultureConfigurations == null) throw new ArgumentNullException(nameof(cultureConfigurations));
+                if(!salesAreaConfigurations.Any() && !cultureConfigurations.Any()) throw new ArgumentException($"{nameof(salesAreaConfigurations)} and {nameof(cultureConfigurations)} can not both be empty");
 
                 logger.LogInformation(
                     "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameter Action: {action}",
                     traceId,
-                    nameof(FeedBuilderExtension),
+                    nameof(ProductFeedUnifierHelper),
                     nameof(LoggingTypes.CheckpointLog),
                     nameof(CombineMarketProducts),
                     "Starting product combination process",
@@ -90,7 +55,7 @@ namespace FeedService.Jobs
                 logger.LogInformation(
                     "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters ProductCount: {productCount}",
                     traceId,
-                    nameof(FeedBuilderExtension),
+                    nameof(ProductFeedUnifierHelper),
                     nameof(LoggingTypes.CheckpointLog),
                     nameof(CombineMarketProducts),
                     "Successfully combined products",
@@ -105,7 +70,7 @@ namespace FeedService.Jobs
                     ex,
                     "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Error Source: {errorSource} Error Message: {errorMessage} Error Stacktrace: {errorStackTrace} Error Inner Exception: {errorInnerException} Internal Message: {internalMessage}",
                     traceId,
-                    nameof(FeedBuilderExtension),
+                    nameof(ProductFeedUnifierHelper),
                     nameof(LoggingTypes.ErrorLog),
                     nameof(CombineMarketProducts),
                     ex.Source,
@@ -121,7 +86,7 @@ namespace FeedService.Jobs
         /// <summary>
         /// Processes culture-specific products and adds them to the combined products dictionary
         /// </summary>
-        private static void ProcessCultureProducts(CultureConfiguration culture, Dictionary<string, Dictionary<string, object>> productsByPartNo)
+        public static void ProcessCultureProducts(CultureConfiguration culture, Dictionary<string, Dictionary<string, object>> productsByPartNo)
         {
             foreach (var product in culture.Products)
             {
@@ -138,7 +103,7 @@ namespace FeedService.Jobs
         /// <summary>
         /// Processes sales area-specific products and adds them to the combined products dictionary
         /// </summary>
-        private static void ProcessSalesAreaProducts(SalesAreaConfiguration salesArea, Dictionary<string, Dictionary<string, object>> productsByPartNo)
+        public static void ProcessSalesAreaProducts(SalesAreaConfiguration salesArea, Dictionary<string, Dictionary<string, object>> productsByPartNo)
         {
             foreach (var priceProduct in salesArea.ProductsPriceInfo)
             {
@@ -155,7 +120,7 @@ namespace FeedService.Jobs
         /// <summary>
         /// Adds properties from a source object to a dictionary with appropriate suffix
         /// </summary>
-        private static void AddPropertiesWithSuffix(
+        public static void AddPropertiesWithSuffix(
             object source,
             Dictionary<string, object> destination,
             string suffix)

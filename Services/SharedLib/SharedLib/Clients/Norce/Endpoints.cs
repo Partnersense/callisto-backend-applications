@@ -10,6 +10,9 @@ public static class Endpoints
     /// <returns></returns>
     public static string GetEndpoint(string baseUrl, string serviceEndpoint)
     {
+        if (serviceEndpoint.Contains(baseUrl))
+            return serviceEndpoint;
+
         var combinedUrl = $"{baseUrl.TrimEnd('/')}/{serviceEndpoint.TrimStart('/')}";
         return combinedUrl;
     }
@@ -36,8 +39,8 @@ public static class Endpoints
             public static string ListFlags(string? cultureCode = "") =>
                 $"{Base}ListFlags?format=json&cultureCode={cultureCode}";
 
-            public static string ListProducts2(List<int> statusSeed, List<int> pricelistSeed, int SalesAreaId) =>
-                $"{Base}ListProducts2?statusSeed={string.Join(",", statusSeed)}&pricelistSeed={string.Join(",", pricelistSeed)}&salesAreaId={SalesAreaId}";
+            public static string ListProducts2(List<int> statusSeed, List<int> pricelistSeed, int SalesAreaId, int pageNumber, int pageSize) =>
+                $"{Base}ListProducts2?format=json&statusSeed={string.Join(",", statusSeed)}&pricelistSeed={string.Join(",", pricelistSeed)}&salesAreaId={SalesAreaId}&pageNo={pageNumber}&pageSize={pageSize}";
         }
         public static class Shopping
         {
@@ -104,6 +107,7 @@ public static class Endpoints
             public const string ClientCultures = $"{Base}Application/ClientCultures";
             public const string ClientManufacturers = $"{Base}Application/ClientManufacturers";
             public const string ClientPriceLists = $"{Base}Application/ClientPriceLists";
+            public const string ClientPriceListsIncPriceList = $"{Base}Application/ClientPriceLists?$expand=PriceList";
             public const string ClientSuppliers = $"{Base}Application/ClientSuppliers";
             public const string ClientSalesAreas = $"{Base}Application/SalesAreas";
             public const string ClientWarehouses = $"{Base}Application/ClientWarehouses";
