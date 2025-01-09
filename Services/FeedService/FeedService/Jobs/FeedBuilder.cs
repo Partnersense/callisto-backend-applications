@@ -36,6 +36,23 @@ using NorceConstants = SharedLib.Constants.NorceConstants.NorceConstants;
 
 namespace FeedService.Jobs;
 
+
+/// <summary>
+/// Service responsible for building and managing product feeds by integrating data from multiple sources.
+/// The FeedBuilder fetches product data from Norce, processes it for different markets and cultures,
+/// combines the data into a unified feed, and uploads it to chosen Storage.
+/// </summary>
+/// <remarks>
+/// The FeedBuilder performs the following key operations:
+/// 1. Fetches configuration and market data from norce
+/// 2. Processes product data for different cultures and sales areas
+/// 3. Combines the data into a unified feed where each product contains properties for all markets and sales areas
+/// 4. Uploads the final feed to Storage
+/// 
+/// Feed Property Format:
+/// - Culture-specific properties: "{PropertyName}_{CultureCode}" (e.g., "Title_en-US")
+/// - Sales area properties: "{PropertyName}_{SalesAreaCode}" (e.g., "Price_SE")
+/// </remarks>
 public class FeedBuilder(
     ILogger<FeedBuilder> logger,
     IConfigurationRefresher configurationRefresher,

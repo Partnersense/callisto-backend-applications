@@ -24,7 +24,6 @@ public static class LoggingConfiguration
     /// <param name="blobLoggingOptions">Optional options for Azure Blob logging. If no parameter is passed, logging to blob will not be added.</param>
     public static void AddDefaultLogging(this WebApplicationBuilder builder, ElasticLoggingModuleOptions elasticLoggingOptions, AzureBlobLoggingModuleOptions? blobLoggingOptions = null)
     {
-       
 
         // Add console logging
         var loggerConfiguration = new LoggerConfiguration()
@@ -32,14 +31,7 @@ public static class LoggingConfiguration
 
         if (elasticLoggingOptions.RunElasticLocally)
         {
-            if (elasticLoggingOptions == null) throw new ArgumentNullException(nameof(elasticLoggingOptions));
-
-            if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticCloudId))
-                throw new ArgumentException("ElasticCloudId must not be null or empty", nameof(elasticLoggingOptions.ElasticCloudId));
-            if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticUser))
-                throw new ArgumentException("ElasticUser must not be null or empty", nameof(elasticLoggingOptions.ElasticUser));
-            if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticPassword))
-                throw new ArgumentException("ElasticPassword must not be null or empty", nameof(elasticLoggingOptions.ElasticPassword));
+            ValidateElevateLogging(elasticLoggingOptions);
 
             // Add Elastic Cloud logging
             loggerConfiguration.WriteTo.ElasticCloud(elasticLoggingOptions.ElasticCloudId, elasticLoggingOptions.ElasticUser,
@@ -64,12 +56,7 @@ public static class LoggingConfiguration
         // Add Azure Blob logging only if blobLoggingOptions is provided
         if (blobLoggingOptions != null && builder.Environment.IsProduction())
         {
-            if (string.IsNullOrEmpty(blobLoggingOptions.ConnectionString))
-                throw new ArgumentException("ConnectionString must not be null or empty", nameof(blobLoggingOptions.ConnectionString));
-            if (string.IsNullOrEmpty(blobLoggingOptions.ContainerName))
-                throw new ArgumentException("ContainerName must not be null or empty", nameof(blobLoggingOptions.ContainerName));
-            if (string.IsNullOrEmpty(blobLoggingOptions.FileName))
-                throw new ArgumentException("FileName must not be null or empty", nameof(blobLoggingOptions.FileName));
+            ValidateBlobLoggingOptions(blobLoggingOptions);
 
             loggerConfiguration.WriteTo.AzureBlobStorage(blobLoggingOptions.ConnectionString, LogEventLevel.Information,
                 blobLoggingOptions.ContainerName, blobLoggingOptions.FileName);
@@ -79,5 +66,42 @@ public static class LoggingConfiguration
 
         builder.Host.UseSerilog();
         builder.Services.AddLogging();
+    }
+
+    /// <summary>
+    /// Validates the Azure Blob logging options for required values
+    /// </summary>
+    /// <param name="blobLoggingOptions">The Azure Blob logging options to validate</param>
+    /// <exception cref="ArgumentException">Thrown when required values are missing</exception>
+    private static void ValidateBlobLoggingOptions(AzureBlobLoggingModuleOptions blobLoggingOptions)
+    {
+        if (string.IsNullOrEmpty(blobLoggingOptions.ConnectionString))
+            throw new ArgumentException("ConnectionString must not be null or empty", nameof(blobLoggingOptions.ConnectionString));
+
+        if (string.IsNullOrEmpty(blobLoggingOptions.ContainerName))
+            throw new ArgumentException("ContainerName must not be null or empty", nameof(blobLoggingOptions.ContainerName));
+
+        if (string.IsNullOrEmpty(blobLoggingOptions.FileName))
+            throw new ArgumentException("FileName must not be null or empty", nameof(blobLoggingOptions.FileName));
+    }
+
+    /// <summary>
+    /// Validates the Elastic logging options for required values
+    /// </summary>
+    /// <param name="elasticLoggingOptions">The Elastic logging options to validate</param>
+    /// <exception cref="ArgumentNullException">Thrown when options are null</exception>
+    /// <exception cref="ArgumentException">Thrown when required values are missing</exception>
+    private static void ValidateElevateLogging(ElasticLoggingModuleOptions elasticLoggingOptions)
+    {
+        if (elasticLoggingOptions == null) throw new ArgumentNullException(nameof(elasticLoggingOptions));
+
+        if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticCloudId))
+            throw new ArgumentException("ElasticCloudId must not be null or empty", nameof(elasticLoggingOptions.ElasticCloudId));
+
+        if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticUser))
+            throw new ArgumentException("ElasticUser must not be null or empty", nameof(elasticLoggingOptions.ElasticUser));
+
+        if (string.IsNullOrEmpty(elasticLoggingOptions.ElasticPassword))
+            throw new ArgumentException("ElasticPassword must not be null or empty", nameof(elasticLoggingOptions.ElasticPassword));
     }
 }
