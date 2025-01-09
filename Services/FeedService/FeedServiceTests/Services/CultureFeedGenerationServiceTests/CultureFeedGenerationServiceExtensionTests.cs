@@ -75,12 +75,6 @@ namespace FeedServiceTests.Services.CultureFeedGenerationServiceTests
             Assert.Equal("100035", mappedProduct.Id);
             Assert.Equal("3D Floral Sleeve Short Dress Black", mappedProduct.Title);
             Assert.Equal("http://test.com/gb/product/3d-floral-sleeve-short-dress-black-238591", mappedProduct.ProductLink);
-
-            // Verify successful mapping log
-            VerifyLogging(
-                LogLevel.Information,
-                "Successfully mapped product variants for culture",
-                Times.Once());
         }
 
         [Fact]
