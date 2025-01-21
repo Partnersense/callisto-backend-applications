@@ -43,6 +43,7 @@ namespace FeedService.Services.StorageServices
 
                 // Validate inputs
                 if (content == null) throw new ArgumentNullException(nameof(content));
+                if (content.Count == 0) throw new ArgumentException("Attempting to upload empty content");
                 if (options == null) throw new ArgumentNullException(nameof(options));
 
                 // Ensure container exists
@@ -100,7 +101,7 @@ namespace FeedService.Services.StorageServices
                     "Failed to upload file to Azure Storage",
                     options
                 );
-                throw;
+                return false;
             }
         }
 

@@ -29,7 +29,7 @@ namespace FeedService.Services.CultureConfigurationServices
                 if (string.IsNullOrEmpty(culturesResponse))
                     throw new ArgumentNullException(nameof(culturesResponse));
 
-                var cultures = ODataHelper.DeserializeODataResponse<ClientCultureResponse>(culturesResponse,logger,traceId);
+                var cultures = ODataHelper.DeserializeODataResponse<ClientCultureResponse>(culturesResponse, logger, traceId);
                 if (cultures == null || !cultures.Any())
                     throw new ArgumentNullException(nameof(cultures));
 
@@ -48,11 +48,27 @@ namespace FeedService.Services.CultureConfigurationServices
                     }
                 }
 
+                logger.LogInformation(
+                    "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters",
+                    traceId,
+                    nameof(CultureConfigurationService),
+                    nameof(LoggingTypes.InformationLog),
+                    nameof(GetCultureConfigurations),
+                    "Successfully Executed GetCultureConfigurations"
+                );
                 return marketConfigs;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "TraceId: {traceId} Service: {serviceName} LogType: {logType} Error Source: {errorSource} Error Message: {errorMessage} Error Stacktrace: {errorStackTrace} Error Inner Exception: {errorInnerException} Internal Message: {internalMessage}| Other Parameters", traceId, nameof(CultureConfigurationService), nameof(LoggingTypes.ErrorLog), ex.Source, ex.Message, ex.StackTrace, ex.InnerException, "An unexpected error occurred while retrieving market configurations");
+                logger.LogError(ex, "TraceId: {traceId} Service: {serviceName} LogType: {logType} Error Source: {errorSource} Error Message: {errorMessage} Error Stacktrace: {errorStackTrace} Error Inner Exception: {errorInnerException} Internal Message: {internalMessage}| Other Parameters",
+                    traceId,
+                    nameof(CultureConfigurationService),
+                    nameof(LoggingTypes.ErrorLog),
+                    ex.Source,
+                    ex.Message,
+                    ex.StackTrace,
+                    ex.InnerException,
+                    "An unexpected error occurred while retrieving market configurations");
                 throw ex;
             }
         }

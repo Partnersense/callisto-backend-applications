@@ -74,12 +74,13 @@ public class FeedBuilder(
         try
         {
             logger.LogInformation(
-                "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message}",
+                "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameter Action: {action}",
                 traceId,
-                nameof(FeedBuilder),
+                nameof(Execute),
                 nameof(LoggingTypes.CheckpointLog),
                 nameof(Execute),
-                "Starting feed generation"
+                "feed building process",
+                nameof(MethodActionLogTypes.Starting)
             );
 
             // Refresh app configuration
@@ -109,7 +110,7 @@ public class FeedBuilder(
             }
 
             //Upload feed to choosen storage, the one impemented currently is azure, but can be changed easily
-            var uploadSuccess = await storageUploadService.UploadAsync(combinedFeed, new StorageUploadOptions { FileFormat = FileConstants.Json, FileName = traceId.ToString(), IsPublic = false }, traceId, cancellationToken);
+            var uploadSuccess = await storageUploadService.UploadAsync(combinedFeed, new StorageUploadOptions { FileFormat = FileConstants.Json, FileName = traceId.ToString(), IsPublic = false, FileNamePostfix = traceId.ToString()}, traceId, cancellationToken);
 
             stopwatch.Stop();
 
@@ -119,29 +120,34 @@ public class FeedBuilder(
             }
 
             logger.LogInformation(
-                "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameters ExecutionTime: {executionTime}ms",
+                "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameter Action: {action} ExecutionTime: {executionTime}ms",
                 traceId,
-                nameof(FeedBuilder),
+                nameof(Execute),
                 nameof(LoggingTypes.CheckpointLog),
                 nameof(Execute),
                 "Feed generation completed successfully",
+                nameof(MethodActionLogTypes.Completed),
                 stopwatch.ElapsedMilliseconds
             );
         }
         catch (OperationCanceledException)
         {
+            stopwatch.Stop();
             logger.LogInformation(
-                "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message}",
+                "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Message: {message} | Other Parameter Action: {action}",
                 traceId,
                 nameof(FeedBuilder),
                 nameof(LoggingTypes.CheckpointLog),
                 nameof(Execute),
-                "Feed generation was cancelled"
+                "Feed generation was cancelled",
+                nameof(MethodActionLogTypes.Aborted)
+
             );
             throw;
         }
         catch (Exception ex)
         {
+            stopwatch.Stop();
             logger.LogError(
                 ex,
                 "TraceId: {traceId} Service: {serviceName} LogType: {logType} Method: {method} Error Source: {errorSource} Error Message: {errorMessage} Error Stacktrace: {errorStackTrace} Error Inner Exception: {errorInnerException} Internal Message: {internalMessage} | Other Parameters ExecutionTime: {executionTime}ms",

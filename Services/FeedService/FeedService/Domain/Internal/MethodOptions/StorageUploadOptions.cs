@@ -18,7 +18,7 @@
         /// <summary>
         /// Whether the file should be publicly accessible
         /// </summary>
-        public bool IsPublic { get; set; }
+        public bool IsPublic { get; set; } = false;
 
         /// <summary>
         /// Optional postfix to append to the file name
