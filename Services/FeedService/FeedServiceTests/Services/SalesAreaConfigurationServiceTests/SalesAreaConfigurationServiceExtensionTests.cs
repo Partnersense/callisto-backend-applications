@@ -43,6 +43,7 @@ namespace FeedServiceTests.Services.SalesAreaConfigurationServiceTests
                 PriceListId = 1,
                 SalesAreaId = 1,
                 CurrencyId = 1,
+                IsActive = true,
                 PriceList = new PriceListResponse
                 {
                     Id = 1,
@@ -135,6 +136,116 @@ namespace FeedServiceTests.Services.SalesAreaConfigurationServiceTests
         }
 
         [Fact]
+        public void MapSalesAreaToSalesAreaConfiguration_WithPriceListWithNullSalesAre_PrimarySalesArea_IncludePriceList()
+        {
+            // Arrange
+            var salesArea = new SalesAreaResponse
+            {
+                SalesAreaId = 1,
+                Code = "US",
+                IsPrimary = true,
+                Created = DateTime.UtcNow,
+                Updated = null,
+                ClientId = 1006,
+                CreatedBy = 1
+            };
+
+            var priceLists = new List<PriceListClientResponse>
+            {
+                new()
+                {
+                    PriceListId = 1,
+                    SalesAreaId = null,
+                    CurrencyId = 1,
+                    IsActive = true,
+                    PriceList = new PriceListResponse
+                    {
+                        Id = 1,
+                        IsActive = true,
+                        DefaultName = "Standard US"
+                    }
+                }
+            };
+
+            var currencies = new List<CurrenciesResponse>
+            {
+                new()
+                {
+                    Id = 1,
+                    Code = "USD",
+                    DefaultName = "US Dollar",
+                    IsActive = true
+                }
+            };
+
+            // Act
+            var result = SalesAreaConfigurationServiceExtension.MapSalesAreaToSalesAreaConfiguration(
+                salesArea, priceLists, currencies, _loggerMock.Object, _testTraceId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(salesArea.SalesAreaId, result.SalesAreaId);
+            Assert.Equal(salesArea.Code, result.SalesAreaCode);
+            Assert.Equal("USD", result.CurrencyCode);
+            Assert.Equal(salesArea.IsPrimary, result.IsPrimary);
+            Assert.Equal(salesArea.Created, result.Created);
+            Assert.Equal(salesArea.Updated, result.Updated);
+            Assert.Single(result.PriceListIds);
+            Assert.Equal(1, result.PriceListIds[0]);
+        }
+
+        [Fact]
+        public void MapSalesAreaToSalesAreaConfiguration_WithPriceListWithNullSalesAre_NotPrimarySalesArea_DoesNotIncludePriceList()
+        {
+            // Arrange
+            var salesArea = new SalesAreaResponse
+            {
+                SalesAreaId = 1,
+                Code = "US",
+                IsPrimary = false,
+                Created = DateTime.UtcNow,
+                Updated = null,
+                ClientId = 1006,
+                CreatedBy = 1
+            };
+
+            var priceLists = new List<PriceListClientResponse>
+            {
+                new()
+                {
+                    PriceListId = 1,
+                    SalesAreaId = null,
+                    CurrencyId = 1,
+                    IsActive = true,
+                    PriceList = new PriceListResponse
+                    {
+                        Id = 1,
+                        IsActive = true,
+                        DefaultName = "Standard US"
+                    }
+                }
+            };
+
+            var currencies = new List<CurrenciesResponse>
+            {
+                new()
+                {
+                    Id = 1,
+                    Code = "USD",
+                    DefaultName = "US Dollar",
+                    IsActive = true
+                }
+            };
+
+            // Act
+            var result = SalesAreaConfigurationServiceExtension.MapSalesAreaToSalesAreaConfiguration(
+                salesArea, priceLists, currencies, _loggerMock.Object, _testTraceId);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
         public void GetCurrencyCodeForSalesArea_WithValidData_ReturnsCurrencyCode()
         {
             // Arrange
@@ -219,6 +330,7 @@ namespace FeedServiceTests.Services.SalesAreaConfigurationServiceTests
                 PriceListId = 1,
                 SalesAreaId = 1,
                 CurrencyId = 1,
+                IsActive = true,
                 PriceList = new PriceListResponse { Id = 1, IsActive = true }
             },
             new()
@@ -226,6 +338,7 @@ namespace FeedServiceTests.Services.SalesAreaConfigurationServiceTests
                 PriceListId = 2,
                 SalesAreaId = 1,
                 CurrencyId = 1,
+                IsActive = true,
                 PriceList = new PriceListResponse { Id = 2, IsActive = true }
             }
         };
@@ -271,6 +384,7 @@ namespace FeedServiceTests.Services.SalesAreaConfigurationServiceTests
                 PriceListId = 1,
                 SalesAreaId = 1,
                 CurrencyId = 1,
+                IsActive = true,
                 PriceList = new PriceListResponse { Id = 1, IsActive = true }
             }
         };

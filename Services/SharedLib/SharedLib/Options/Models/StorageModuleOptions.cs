@@ -11,4 +11,5 @@ public class StorageModuleOptions
 
     [MinLength(1)]
     public required string BlobName { get; init; }
+
 }

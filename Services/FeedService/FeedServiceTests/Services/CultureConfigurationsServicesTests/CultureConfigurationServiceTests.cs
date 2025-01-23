@@ -56,15 +56,20 @@ namespace FeedServiceTests.Services.CultureConfigurationsServicesTests
         {
             // Arrange
             var traceId = Guid.NewGuid();
-            var cultures = new List<ClientCultureResponse>
+            
+            var cultures = new OdataWrapperResponse<ClientCultureResponse>
             {
-                new()
+                Context = "odata",
+                Value = new List<ClientCultureResponse>
                 {
-                    CultureCode = "en-US",
-                    ClientId = 1006,
-                    IsPrimary = true,
-                    Created = DateTime.UtcNow,
-                    CreatedBy = 1
+                    new()
+                    {
+                        CultureCode = "en-US",
+                        ClientId = 1006,
+                        IsPrimary = true,
+                        Created = DateTime.UtcNow,
+                        CreatedBy = 1
+                    }
                 }
             };
 
@@ -136,12 +141,18 @@ namespace FeedServiceTests.Services.CultureConfigurationsServicesTests
         {
             // Arrange
             var traceId = Guid.NewGuid();
-            var cultures = new List<ClientCultureResponse>
+            var cultures = new OdataWrapperResponse<ClientCultureResponse>
             {
-                new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
-                new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false },
-                new() { CultureCode = "nb-NO", ClientId = 1006, IsPrimary = false }
+                Context = "odata",
+                Value = new List<ClientCultureResponse>
+                {
+                    new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
+                    new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false },
+                    new() { CultureCode = "nb-NO", ClientId = 1006, IsPrimary = false }
+                }
             };
+
+            
 
             var culturesJson = JsonSerializer.Serialize(cultures);
             _queryClientMock.Setup(x => x.GetAsync(Endpoints.Query.Application.ClientCultures, It.IsAny<string>()))
@@ -166,11 +177,15 @@ namespace FeedServiceTests.Services.CultureConfigurationsServicesTests
             var traceId = Guid.NewGuid();
             _baseOptions.IncludedCultures = "en-US|sv-SE"; // Only include these cultures
 
-            var cultures = new List<ClientCultureResponse>
+            var cultures = new OdataWrapperResponse<ClientCultureResponse>
             {
-                new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
-                new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false },
-                new() { CultureCode = "nb-NO", ClientId = 1006, IsPrimary = false } // Should be filtered out
+                Context = "odata",
+                Value = new List<ClientCultureResponse>
+                {
+                    new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
+                    new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false },
+                    new() { CultureCode = "nb-NO", ClientId = 1006, IsPrimary = false } // Should be filtered out
+                }
             };
 
             var culturesJson = JsonSerializer.Serialize(cultures);
@@ -195,11 +210,16 @@ namespace FeedServiceTests.Services.CultureConfigurationsServicesTests
             var traceId = Guid.NewGuid();
             _baseOptions.IncludedCultures = ""; // Empty included cultures list
 
-            var cultures = new List<ClientCultureResponse>
+
+            var cultures = new OdataWrapperResponse<ClientCultureResponse>
             {
-                new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
-                new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false },
-                new() { CultureCode = "nb-NO", ClientId = 1006, IsPrimary = false }
+                Context = "odata",
+                Value = new List<ClientCultureResponse>
+                {
+                    new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
+                    new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false },
+                    new() { CultureCode = "nb-NO", ClientId = 1006, IsPrimary = false }
+                }
             };
 
             var culturesJson = JsonSerializer.Serialize(cultures);
@@ -224,10 +244,15 @@ namespace FeedServiceTests.Services.CultureConfigurationsServicesTests
             var traceId = Guid.NewGuid();
             _baseOptions.IncludedCultures = "en-US|sv-SE|non-EXISTENT"; // Include non-existent culture
 
-            var cultures = new List<ClientCultureResponse>
+
+            var cultures = new OdataWrapperResponse<ClientCultureResponse>
             {
-                new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
-                new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false }
+                Context = "odata",
+                Value = new List<ClientCultureResponse>
+                {
+                    new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
+                    new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false }
+                }
             };
 
             var culturesJson = JsonSerializer.Serialize(cultures);
@@ -251,11 +276,16 @@ namespace FeedServiceTests.Services.CultureConfigurationsServicesTests
             var traceId = Guid.NewGuid();
             _baseOptions.IncludedCultures = null; // Null included cultures
 
-            var cultures = new List<ClientCultureResponse>
+
+            var cultures = new OdataWrapperResponse<ClientCultureResponse>
             {
-                new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
-                new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false },
-                new() { CultureCode = "nb-NO", ClientId = 1006, IsPrimary = false }
+                Context = "odata",
+                Value = new List<ClientCultureResponse>
+                {
+                    new() { CultureCode = "en-US", ClientId = 1006, IsPrimary = true },
+                    new() { CultureCode = "sv-SE", ClientId = 1006, IsPrimary = false },
+                    new() { CultureCode = "nb-NO", ClientId = 1006, IsPrimary = false }
+                }
             };
 
             var culturesJson = JsonSerializer.Serialize(cultures);

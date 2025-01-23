@@ -214,6 +214,12 @@ namespace SharedLib.Models.Norce.Query
         public bool? IsStako { get; set; }
 
         /// <summary>
+        /// Indicates if this pricelist is active
+        /// <br/><br/>
+        /// </summary>
+        public bool IsActive { get; set; }
+
+        /// <summary>
         /// The creation date of the price list.
         /// <br/><br/>
         /// Example Values:

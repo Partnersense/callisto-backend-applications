@@ -73,7 +73,7 @@ public class NorceClient : INorceClient
     {
         var response = await _basicPolicy.WrapAsync(_norceRetryPolicy).ExecuteAsync(async () =>
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, query);
+            using var request = new HttpRequestMessage(HttpMethod.Get, query);
             request.Headers.Add(HttpConstants.Headers.ApplicationId, applicationId ?? _config.ApplicationId);
             return await _httpClient.SendAsync(request);
         });

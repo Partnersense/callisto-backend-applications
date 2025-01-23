@@ -77,5 +77,11 @@ namespace FeedService.Domain.Models
         /// "2024-08-20T11:21:16.15Z"
         /// </summary>
         public DateTime? Updated { get; init; }
+
+
+        /// <summary>
+        /// A list of products with the best price info for the salesarea,
+        /// </summary>
+        public List<PriceProduct> ProductsPriceInfo { get; set; } = [];
     }
 }
